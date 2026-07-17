@@ -1,0 +1,468 @@
+:root {
+    /* Color Palette */
+    --bg-dark: #0f172a;        /* Deep Slate Navy (body background) */
+    --panel-dark: #1e293b;     /* Slate Navy for panels and cards */
+    --accent-cyan: #2ca6a4;    /* Primary data color (cyan) */
+    --accent-cyan-glow: rgba(44, 166, 164, 0.4);
+    --accent-gold: #f4b942;    /* Highlight/Warning color (gold/amber) */
+    --text-primary: #f8fafc;   /* White / Off-white for high contrast text */
+    --text-muted: #94a3b8;     /* Gray for secondary label text */
+    --border-glass: rgba(255, 255, 255, 0.08);
+    --bg-glass: rgba(15, 23, 42, 0.75);
+}
+
+*{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    font-family: "Elms Sans", sans-serif;
+    overflow-x: hidden;
+    line-height: 1.6;
+}
+
+#intro {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+    background: radial-gradient(circle at center, #1e293b 0%, #0f172a 70%);
+    position: relative;
+}
+
+.intro-content {
+    max-width: 800px;
+    animation: fadeIn 1.2s ease-out;
+}
+
+.badge {
+    background: rgba(44, 166, 164, 0.15);
+    border: 1px solid var(--accent-cyan);
+    color: var(--accent-cyan);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    display: inline-block;
+    margin-bottom: 24px;
+}
+
+#intro h1 {
+    font-size: 4.5rem;
+    font-weight: 800;
+    letter-spacing: -2px;
+    line-height: 1.1;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, #fff 30%, var(--accent-cyan) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+    font-size: 1.25rem;
+    color: var(--text-muted);
+    font-weight: 300;
+    margin-bottom: 40px;
+    line-height: 1.8;
+}
+
+.scroll-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-muted);
+    font-size: 14px;
+    letter-spacing: 1px;
+}
+
+.scroll-indicator .arrow {
+    width: 24px;
+    height: 24px;
+    border-right: 2px solid var(--text-muted);
+    border-bottom: 2px solid var(--text-muted);
+    transform: rotate(45deg);
+    animation: bounce 2s infinite;
+}
+
+
+/* ==========================================================================
+   SCROLLYTELLING CORE MECHANICS
+   ========================================================================== */
+#scrolly {
+    position: relative;
+    background: var(--bg-dark);
+}
+
+/* Sticky Container: Holds the charts fixed while scroll steps scroll over it */
+#sticky-visual {
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 10;
+    background: var(--bg-dark);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+/* Visualization Overlay: Overlays charts on top of each other and handles fade transitions */
+.viz {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.8s ease-in-out;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+}
+
+/* Make only the active chart visible and interactive */
+.viz.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+svg {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+/* ==========================================================================
+   SCROLLABLE TEXT STEPS (NARRATIVE OVERLAYS)
+   ========================================================================== */
+.scrolly-steps {
+    position: relative;
+    z-index: 20;            /* Position text steps on top of sticky visual */
+    pointer-events: none;   /* Let scroll mouse events pass through to body */
+    margin-top: -100vh;     /* Start scrolling overlay immediately */
+}
+
+/* Each step spans 100vh so that text boxes are spaced out correctly */
+.step {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* Float boxes on the left side of the screen */
+    padding-left: 12vw;
+    margin: 0 auto;
+}
+
+.step:last-child {
+    margin-bottom: 0;
+}
+
+/* Narrative Story Card (Glassmorphism design) */
+.step-content {
+    background: var(--bg-glass);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border-glass);
+    border-radius: 16px;
+    padding: 35px;
+    width: 420px;
+    max-width: 90vw;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    pointer-events: auto;   /* Enable text interaction/clicks on cards */
+}
+
+.step-chapter {
+    color: var(--accent-cyan);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.step-content h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: var(--text-primary);
+}
+
+.step-content p {
+    font-size: 1rem;
+    color: var(--text-muted);
+    font-weight: 300;
+    line-height: 1.7;
+}
+
+/* ==========================================================================
+   OUTRO SCREEN
+   ========================================================================== */
+#outro {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background: radial-gradient(circle at center, #1e293b 0%, #0f172a 70%);
+    position: relative;
+    z-index: 30; /* Overlap scroll area when reached */
+}
+
+.outro-content {
+    max-width: 650px;
+    padding: 30px;
+}
+
+#outro h2 {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 25px;
+}
+
+#outro p {
+    color: var(--text-muted);
+    font-size: 1.15rem;
+    font-weight: 300;
+    margin-bottom: 40px;
+}
+
+.credit {
+    font-size: 14px;
+    color: var(--text-muted);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.btn-top {
+    background: transparent;
+    border: 1px solid var(--accent-cyan);
+    color: var(--accent-cyan);
+    padding: 12px 28px;
+    border-radius: 30px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-top:hover {
+    background: var(--accent-cyan);
+    color: var(--bg-dark);
+    box-shadow: 0 0 15px var(--accent-cyan-glow);
+}
+
+/* ==========================================================================
+   D3 AXIS & CHART STYLING
+   ========================================================================== */
+.x-axis line, 
+.y-axis line, 
+.x-axis path,
+.y-axis path {
+    stroke: rgba(255, 255, 255, 0.15);
+}
+
+.x-axis text,
+.y-axis text {
+    fill: var(--text-muted);
+    font-size: 11px;
+}
+
+/* Tooltip Styling */
+#tooltip {
+    position: absolute;
+    background: rgba(15, 23, 42, 0.95);
+    color: var(--text-primary);
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    border: 1px solid var(--border-glass);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    z-index: 100;
+}
+
+#tooltip strong {
+    color: var(--accent-cyan);
+    font-weight: 600;
+}
+
+/* TV Boom Indicator Label */
+#page_label {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    color: var(--text-primary);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    padding: 8px 16px;
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid var(--border-glass);
+    border-radius: 6px;
+    z-index: 50;
+    pointer-events: none;
+}
+
+
+/* ==========================================================================
+   UPGRADED D3 MAP STYLING & ANIMATIONS
+   ========================================================================== */
+/* Map country vectors */
+.country {
+    fill: #1e293b;
+    stroke: rgba(255, 255, 255, 0.05);
+    stroke-width: 0.5px;
+    transition: fill 0.3s, stroke 0.3s;
+}
+
+.country.active-partner {
+    fill: #1e3a5f;
+    stroke: rgba(255, 255, 255, 0.1);
+}
+
+.country.epicenter {
+    fill: #0f2d4a;
+    stroke: var(--accent-cyan);
+    stroke-width: 1.5px;
+}
+
+.country:hover {
+    fill: #334155;
+    stroke: rgba(255, 255, 255, 0.3);
+}
+
+/* Flow line curves */
+.flow-line {
+    fill: none;
+    transition: stroke-width 0.3s, stroke 0.3s, opacity 0.3s;
+}
+
+.flow-line.incoming {
+    stroke: var(--accent-cyan);
+}
+
+.flow-line.outgoing {
+    stroke: var(--accent-gold);
+}
+
+/* Flow particle moving overlays */
+.flow-animation-line {
+    fill: none;
+    stroke-linecap: round;
+    stroke-dasharray: 6 15;
+    animation: flow-dash 1.8s linear infinite;
+}
+
+.flow-animation-line.incoming {
+    stroke: #4fd1c5;
+}
+
+.flow-animation-line.outgoing {
+    stroke: #f6ad55;
+}
+
+/* Keyframe for particle moving animation */
+@keyframes flow-dash {
+    to {
+        stroke-dashoffset: -42;
+    }
+}
+
+/* Zoom controls HUD widget */
+.zoom-controls {
+    position: absolute;
+    bottom: 30px;
+    right: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 60;
+}
+
+.zoom-btn {
+    width: 36px;
+    height: 36px;
+    background: rgba(30, 41, 59, 0.85);
+    border: 1px solid var(--border-glass);
+    color: var(--text-primary);
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(4px);
+    transition: all 0.2s ease;
+}
+
+.zoom-btn:hover {
+    background: var(--accent-cyan);
+    color: var(--bg-dark);
+    border-color: var(--accent-cyan);
+}
+
+/* ==========================================================================
+   ANIMATIONS & MEDIA QUERIES
+   ========================================================================== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0) rotate(45deg);
+    }
+    40% {
+        transform: translateY(-10px) rotate(45deg);
+    }
+    60% {
+        transform: translateY(-5px) rotate(45deg);
+    }
+}
+
+@media (max-width: 900px) {
+    #intro h1 {
+        font-size: 3rem;
+    }
+    
+    .step {
+        padding-left: 0;
+        justify-content: center;
+    }
+    
+    .step-content {
+        width: 90%;
+    }
+    
+    #page_label {
+        top: auto;
+        bottom: 20px;
+        left: 20px;
+        right: auto;
+    }
+}

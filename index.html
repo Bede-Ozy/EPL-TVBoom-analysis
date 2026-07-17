@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE TV BOOM: How Cash Reshaped English Football</title>
+    <!-- Google Fonts for premium typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- Load D3 and Scrollama libraries -->
+    <script src="js/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/scrollama"></script>
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- INTRO TITLE SCREEN -->
+    <section id="intro">
+        <div class="intro-content">
+            <span class="badge">Visual Data Story</span>
+            <h1>THE TV BOOM</h1>
+            <p class="subtitle">How a multibillion-pound television rights deal in 2013 permanently altered the landscape of English football and global player transfers.</p>
+            <div class="scroll-indicator">
+                <span>Scroll Down to Begin</span>
+                <div class="arrow"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SCROLLYTELLING MAIN SECTION -->
+    <section id="scrolly">
+        <!-- STICKY VISUAL CONTAINER
+             This stays fixed in the viewport while the text boxes scroll past. -->
+        <div id="sticky-visual">
+            <div id="ch4" class="viz"></div>
+            <div id="ch6" class="viz"></div>
+            <div id="ch7" class="viz"></div>
+            <div id="ch8" class="viz"></div>
+        </div>
+
+        <!-- SCROLLABLE TEXT STEPS (NARRATIVE TEXT BOXES)
+             Each step corresponds to a particular visualization state. -->
+        <article class="scrolly-steps">
+            <!-- Step 0 triggers Chapter 4 (Pre-TV spending) -->
+            <div class="step" data-step="0">
+                <div class="step-content">
+                    <span class="step-chapter">Chapter 1</span>
+                    <h2>The Pre-TV Era</h2>
+                    <p>Before the astronomical TV contracts of the 2010s, Premier League clubs spent at a steady, moderate pace. Total league spend hovered below £500M annually, with clubs operating under traditional budget constraints.</p>
+                </div>
+            </div>
+            
+            <!-- Step 1 triggers Chapter 5 (Post-TV spending) -->
+            <div class="step" data-step="1">
+                <div class="step-content">
+                    <span class="step-chapter">Chapter 2</span>
+                    <h2>The TV Rights Boom</h2>
+                    <p>In 2013, the Premier League signed an unprecedented domestic television rights deal worth billions. This sudden influx of TV cash completely transformed the transfer market, sending annual spending skyward past £1.5B.</p>
+                </div>
+            </div>
+            
+            <!-- Step 2 triggers Chapter 6 (Global map flow) -->
+            <div class="step" data-step="2">
+                <div class="step-content">
+                    <span class="step-chapter">Chapter 3</span>
+                    <h2>Mapping the Talent Influx</h2>
+                    <p>Flush with cash, England became the financial epicenter of the global football economy. English clubs began importing top-tier talent from South America, across continental Europe, and beyond. Hover over flow lines to explore country-to-country transfer volumes, and use the zoom/pan features to inspect details.</p>
+                </div>
+            </div>
+            
+            <!-- Step 3 triggers Chapter 7 (Valuation stats cards) -->
+            <div class="step" data-step="3">
+                <div class="step-content">
+                    <span class="step-chapter">Chapter 4</span>
+                    <h2>Valuation Explosion</h2>
+                    <p>With more money chasing the same elite players, player valuations skyrocketed. The average transfer fee grew by a staggering 190%, making multi-million pound transfers the new standard for even mid-table clubs.</p>
+                </div>
+            </div>
+            
+            <!-- Step 4 triggers Chapter 8 (Stacked bar chart by position) -->
+            <div class="step" data-step="4">
+                <div class="step-content">
+                    <span class="step-chapter">Chapter 5</span>
+                    <h2>Investment by Position</h2>
+                    <p>Where did this massive wave of cash go? While forwards and midfielders continued to command premium fees, investment in defensive lines also saw dramatic increases, highlighting a league-wide inflation in squad values.</p>
+                </div>
+            </div>
+        </article>
+    </section>
+
+    <!-- OUTRO / CONCLUSION SCREEN -->
+    <section id="outro">
+        <div class="outro-content">
+            <h2>The New Reality of Football</h2>
+            <p>The Premier League's TV boom cemented its position as the wealthiest league in the world. What began as a domestic broadcasting war has permanently reshaped the global football economy, creating a financial divide that remains wider than ever.</p>
+            <div class="credit">
+                <p>Data Sources: Transfermarkt & World GeoJSON</p>
+                <div style="display: flex; gap: 16px; justify-content: center; margin-top: 10px;">
+                    <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="btn-top">Back to Top</button>
+                    <a href="tutorial.html" class="btn-top" style="text-decoration: none; display: inline-flex; align-items: center;">Read Tutorial</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tooltip element for D3 visual hover effects -->
+    <div id="tooltip"></div>
+    <!-- Simple helper indicator to show the TV Boom point -->
+    <div id="page_label"></div>
+
+    <!-- Load the Javascript logic scripts -->
+    <script src="js/chapter6.js"></script>
+    <script src="js/chapter7.js"></script>
+    <script src="js/chapter8.js"></script>
+    <script src="js/chapter4.js"></script>
+
+    <!-- Scrollama Scrollytelling Setup Script -->
+    <script>
+        // Once all DOM content is loaded, set up Scrollama
+        document.addEventListener("DOMContentLoaded", () => {
+            // 1. Initialize the Scrollama instance
+            const scroller = scrollama();
+
+            // 2. Set up the scrolling parameters
+            scroller
+                .setup({
+                    step: "#scrolly .step", // The elements that trigger transitions
+                    offset: 0.5,           // Trigger the step event when its center crosses the middle of the screen
+                    progress: true,        // Enable progress tracking for scroll-linked animations
+                    debug: false           // Hide debug lines (set to true if you want to see triggers)
+                })
+                .onStepEnter(handleStepEnter)
+                .onStepProgress(handleStepProgress);
+
+            // 3. Define the event handler for when a step enters the trigger line
+            function handleStepEnter(response) {
+                // response = { element, index, direction }
+                const index = response.index;
+                console.log(`Scrollama Step Entered: ${index}`);
+
+                // Update active navigation indicators or console logs
+                setActiveVisual(index);
+            }
+            // 3b. Define the event handler for progress updates (between 0.0 and 1.0)
+            function handleStepProgress(response) {
+                const index = response.index;
+                const progress = response.progress;
+                
+                // If it's Step 1 (Post-TV Spending Drawing)
+                if (index === 1) {
+                    // Trigger the line-drawing animation if scrolling past halfway downwards (progress >= 0.5)
+                    if (progress >= 0.5) {
+                        if (typeof window.triggerLineChartCountUp === "function") {
+                            window.triggerLineChartCountUp();
+                        }
+                    } else {
+                        // Trigger the line-erasing animation if scrolling past halfway upwards (progress < 0.5)
+                        if (typeof window.triggerLineChartCountDown === "function") {
+                            window.triggerLineChartCountDown();
+                        }
+                    }
+                }
+
+                // If it's Step 3 (Valuation Explosion)
+                if (index === 3) {
+                    // Trigger the count-up animation if scrolling past halfway downwards (progress >= 0.5)
+                    if (progress >= 0.5) {
+                        if (typeof window.triggerValuationCountUp === "function") {
+                            window.triggerValuationCountUp();
+                        }
+                    } else {
+                        // Trigger the count-down animation if scrolling past halfway upwards (progress < 0.5)
+                        if (typeof window.triggerValuationCountDown === "function") {
+                            window.triggerValuationCountDown();
+                        }
+                    }
+                }
+
+                // If it's Step 4 (Investment by Position)
+                if (index === 4) {
+                    // Trigger the bar-growth animation if scrolling past halfway downwards (progress >= 0.5)
+                    if (progress >= 0.5) {
+                        if (typeof window.triggerChapter8CountUp === "function") {
+                            window.triggerChapter8CountUp();
+                        }
+                    } else {
+                        // Trigger the bar-shrink animation if scrolling past halfway upwards (progress < 0.5)
+                        if (typeof window.triggerChapter8CountDown === "function") {
+                            window.triggerChapter8CountDown();
+                        }
+                    }
+                }
+            }
+
+            // 4. Function to toggle visual states depending on the active step index
+            function setActiveVisual(index) {
+                // First, remove the "active" class from all chart containers.
+                // This starts a CSS opacity transition (fading them out).
+                d3.selectAll(".viz").classed("active", false);
+
+                // Set active states based on index (0 to 4)
+                if (index === 0) {
+                    // Step 0: Pre-TV Spending Line Chart
+                    d3.select("#ch4").classed("active", true);
+                    if (typeof window.setLineChartState === "function") {
+                        window.setLineChartState("pre");
+                    }
+                    
+                    // Reset Valuation count-up so it's clean if we scroll back up
+                    if (typeof window.setValuationState === "function") {
+                        window.setValuationState("pre");
+                    }
+                } 
+                else if (index === 1) {
+                    // Step 1: Post-TV Spending Line Chart (re-use the same chart element #ch4, but show more data)
+                    d3.select("#ch4").classed("active", true);
+                    // handleStepProgress dynamically orchestrates count-up/down drawing triggers based on progress threshold!
+                    
+                    // Reset Valuation count-up
+                    if (typeof window.setValuationState === "function") {
+                        window.setValuationState("pre");
+                    }
+                } 
+                else if (index === 2) {
+                    // Step 2: Global Transfer Map
+                    d3.select("#ch6").classed("active", true);
+                    
+                    // Persist Line Chart in the Post-TV state when scrolling past it downwards
+                    if (typeof window.setLineChartState === "function") {
+                        window.setLineChartState("post");
+                    }
+                    
+                    // Reset Valuation count-up to Pre-TV state
+                    if (typeof window.setValuationState === "function") {
+                        window.setValuationState("pre");
+                    }
+                } 
+                else if (index === 3) {
+                    // Step 3: Valuation Explosion Average Stats
+                    d3.select("#ch7").classed("active", true);
+                    
+                    // Persist Line Chart in the Post-TV state
+                    if (typeof window.setLineChartState === "function") {
+                        window.setLineChartState("post");
+                    }
+                    
+                    // handleStepProgress dynamically orchestrates count-up/down triggers based on progress threshold!
+
+                    // Reset Chapter 8 to Pre-TV state
+                    if (typeof window.setChapter8State === "function") {
+                        window.setChapter8State("pre");
+                    }
+                } 
+                else if (index === 4) {
+                    // Step 5: Positional Investment Bar Chart
+                    d3.select("#ch8").classed("active", true);
+                    
+                    // Persist Line Chart in the Post-TV state
+                    if (typeof window.setLineChartState === "function") {
+                        window.setLineChartState("post");
+                    }
+                    
+                    // Keep Valuation in the Post-TV state when scrolling past it downwards
+                    if (typeof window.setValuationState === "function") {
+                        window.setValuationState("post");
+                    }
+                }
+            }
+
+            // Handle browser resize to keep Scrollama trigger offsets precise
+            window.addEventListener("resize", scroller.resize);
+        });
+    </script>
+</body>
+
+</html>
