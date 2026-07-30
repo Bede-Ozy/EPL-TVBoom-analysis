@@ -10,8 +10,15 @@
 // Note: Path is relative to the HTML document loading this script (index.html)
 Promise.all([
     d3.json("data/world.geojson"),
-    d3.csv("data/ch6_transfer_flow.csv")
-]).then(([world, transfers]) => {
+    d3.csv("data/ch6_transfer_flow.csv"),
+    d3.csv("data/ch6_transfer_out_flow.csv")
+]).then(([world, transfersIn, transfersOut]) => {
+
+    // Used only to draw the map
+    const flowData = transfersIn;
+
+    // Used only to calculate tooltip statistics
+    const allTransfers = [...transfersIn, ...transfersOut];
 
     console.log("Chapter 6: Initializing Transfer Flow Map");
 
@@ -141,7 +148,7 @@ Promise.all([
     const flowMap = {};
     const countryStats = {}; // Tracks totals for each country
 
-    transfers.forEach(d => {
+    flowData.forEach(d => {
         const from = d.from_country;
         const to = d.to_country;
         
@@ -173,21 +180,55 @@ Promise.all([
             position: d.player_position
         });
 
-        // Accumulate country statistics
-        const mappedFrom = csvToGeoJsonName(from);
-        const mappedTo = csvToGeoJsonName(to);
+        // // Accumulate country statistics
+        // const mappedFrom = csvToGeoJsonName(from);
+        // const mappedTo = csvToGeoJsonName(to);
 
-        if (!countryStats[mappedFrom]) {
-            countryStats[mappedFrom] = { name: mappedFrom, exportedCount: 0, exportedFee: 0, importedCount: 0, importedFee: 0 };
-        }
-        countryStats[mappedFrom].exportedCount += 1;
-        countryStats[mappedFrom].exportedFee += fee;
+        // if (!countryStats[mappedFrom]) {
+        //     countryStats[mappedFrom] = { name: mappedFrom, exportedCount: 0, exportedFee: 0, importedCount: 0, importedFee: 0 };
+        // }
+        // countryStats[mappedFrom].exportedCount += 1;
+        // countryStats[mappedFrom].exportedFee += fee;
 
-        if (!countryStats[mappedTo]) {
-            countryStats[mappedTo] = { name: mappedTo, exportedCount: 0, exportedFee: 0, importedCount: 0, importedFee: 0 };
+        // if (!countryStats[mappedTo]) {
+        //     countryStats[mappedTo] = { name: mappedTo, exportedCount: 0, exportedFee: 0, importedCount: 0, importedFee: 0 };
+        // }
+        // countryStats[mappedTo].importedCount += 1;
+        // countryStats[mappedTo].importedFee += fee;
+    });
+
+    allTransfers.forEach(d => {
+
+        const from = csvToGeoJsonName(d.from_country);
+        const to = csvToGeoJsonName(d.to_country);
+        const fee = +d.fee_clean || 0;
+
+        if (!countryStats[from]) {
+            countryStats[from] = {
+                name: from,
+                exportedCount: 0,
+                exportedFee: 0,
+                importedCount: 0,
+                importedFee: 0
+            };
         }
-        countryStats[mappedTo].importedCount += 1;
-        countryStats[mappedTo].importedFee += fee;
+
+        countryStats[from].exportedCount++;
+        countryStats[from].exportedFee += fee;
+
+        if (!countryStats[to]) {
+            countryStats[to] = {
+                name: to,
+                exportedCount: 0,
+                exportedFee: 0,
+                importedCount: 0,
+                importedFee: 0
+            };
+        }
+
+        countryStats[to].importedCount++;
+        countryStats[to].importedFee += fee;
+
     });
 
     // Sort players in each flow by fee descending

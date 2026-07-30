@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE TV BOOM: Visual Data Story Documentation</title>
+    <!-- Google Fonts for premium typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* Custom layout variables and styles specific to the Documentation Page */
+        :root {
+            --sidebar-width: 280px;
+            --code-bg: #0b0f19;
+            --card-hover-border: rgba(44, 166, 164, 0.4);
+            --gradient-accent: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-gold) 100%);
+        }
+
+        body.doc-body {
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            font-family: "Outfit", sans-serif;
+            overflow-x: hidden;
+            overflow-y: auto;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Container & Layout */
+        .doc-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Navigation */
+        .doc-sidebar {
+            width: var(--sidebar-width);
+            background: rgba(15, 23, 42, 0.95);
+            border-right: 1px solid var(--border-glass);
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            padding: 40px 24px;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow-y: auto;
+        }
+
+        .doc-sidebar-header {
+            margin-bottom: 30px;
+        }
+
+        .doc-sidebar-logo {
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+
+        .doc-sidebar-subtitle {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .doc-nav-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .doc-nav-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            padding: 10px 14px;
+            border-radius: 8px;
+            display: block;
+            transition: all 0.2s ease;
+            border-left: 2px solid transparent;
+        }
+
+        .doc-nav-link:hover, .doc-nav-link.active {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.03);
+            border-left-color: var(--accent-cyan);
+            padding-left: 18px;
+        }
+
+        .doc-sidebar-footer {
+            margin-top: 40px;
+        }
+
+        /* Main Content Panel */
+        .doc-main {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 60px 80px;
+            max-width: 900px;
+        }
+
+        /* Documentation Headers */
+        .doc-header {
+            border-bottom: 1px solid var(--border-glass);
+            padding-bottom: 40px;
+            margin-bottom: 50px;
+        }
+
+        .doc-badge {
+            background: rgba(244, 185, 98, 0.1);
+            border: 1px solid var(--accent-gold);
+            color: var(--accent-gold);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            display: inline-block;
+            margin-bottom: 16px;
+        }
+
+        .doc-header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            margin-bottom: 15px;
+            line-height: 1.2;
+            background: linear-gradient(135deg, #fff 40%, var(--accent-cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .doc-header p.lead {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            font-weight: 300;
+            max-width: 800px;
+        }
+
+        /* Sections */
+        .doc-section {
+            margin-bottom: 60px;
+            scroll-margin-top: 40px;
+        }
+
+        .doc-section h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .doc-section h2::before {
+            content: "";
+            display: inline-block;
+            width: 8px;
+            height: 24px;
+            background: var(--gradient-accent);
+            border-radius: 4px;
+        }
+
+        .doc-section-desc {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            max-width: 850px;
+        }
+
+        /* Executive Flow Timeline (Non-technical) */
+        .timeline {
+            position: relative;
+            padding-left: 32px;
+            margin: 40px 0;
+        }
+
+        .timeline::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 7px;
+            width: 2px;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: -32px;
+            top: 4px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--panel-dark);
+            border: 3px solid var(--accent-cyan);
+            transition: all 0.3s ease;
+        }
+
+        .timeline-item:hover .timeline-marker {
+            background: var(--accent-cyan);
+            box-shadow: 0 0 10px var(--accent-cyan-glow);
+        }
+
+        .timeline-item.highlight .timeline-marker {
+            border-color: var(--accent-gold);
+        }
+
+        .timeline-item.highlight:hover .timeline-marker {
+            background: var(--accent-gold);
+            box-shadow: 0 0 10px rgba(244, 185, 66, 0.4);
+        }
+
+        .timeline-content {
+            background: var(--panel-dark);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-content:hover {
+            border-color: rgba(255,255,255,0.15);
+            transform: translateX(4px);
+        }
+
+        .timeline-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .timeline-era {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .timeline-era.pre {
+            background: rgba(44, 166, 164, 0.1);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(44, 166, 164, 0.2);
+        }
+
+        .timeline-era.post {
+            background: rgba(244, 185, 66, 0.1);
+            color: var(--accent-gold);
+            border: 1px solid rgba(244, 185, 66, 0.2);
+        }
+
+        .timeline-text {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* Unified Document Card Styling (Single-Column) */
+        .doc-card {
+            background: var(--panel-dark);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            margin-bottom: 40px;
+            overflow: hidden;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .doc-card:hover {
+            border-color: var(--card-hover-border);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+        }
+
+        .doc-card.gold-hover:hover {
+            --card-hover-border: rgba(244, 185, 66, 0.4);
+        }
+
+        .card-header-bar {
+            padding: 20px 24px;
+            background: rgba(15, 23, 42, 0.45);
+            border-bottom: 1px solid var(--border-glass);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .card-chapters {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: rgba(255,255,255,0.05);
+            padding: 4px 10px;
+            border-radius: 4px;
+            color: var(--text-muted);
+        }
+
+        .card-body {
+            padding: 30px;
+        }
+
+        .card-subsection {
+            margin-bottom: 24px;
+        }
+
+        .card-subsection:last-child {
+            margin-bottom: 0;
+        }
+
+        .subsection-title {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .subsection-title.insight {
+            color: var(--accent-cyan);
+        }
+
+        .subsection-title.engineering {
+            color: var(--accent-gold);
+        }
+
+        .card-text {
+            font-size: 1rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+
+        .card-text ul {
+            padding-left: 20px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        .card-text li {
+            margin-bottom: 6px;
+        }
+
+        /* Tech Highlights (Code & Formulas) */
+        .tech-spec {
+            font-family: "Fira Code", monospace;
+            background: var(--code-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 15px;
+            font-size: 0.85rem;
+            color: #e2e8f0;
+            overflow-x: auto;
+            line-height: 1.5;
+        }
+
+        .tech-spec-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--accent-gold);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            padding-bottom: 6px;
+        }
+
+        .interactive-feature {
+            background: rgba(44, 166, 164, 0.05);
+            border-left: 3px solid var(--accent-cyan);
+            padding: 12px 16px;
+            border-radius: 0 8px 8px 0;
+            margin-top: 15px;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+        }
+
+        .interactive-feature strong {
+            color: var(--accent-cyan);
+        }
+
+        /* Technology Stack Grid */
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .tech-card {
+            background: var(--panel-dark);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .tech-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .tech-card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .tech-card-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* Buttons & Footer */
+        .btn-footer {
+            margin-top: 40px;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        /* Responsive Layout Adjustment for Sidebar */
+        @media (max-width: 900px) {
+            .doc-sidebar {
+                display: none;
+            }
+            .doc-main {
+                margin-left: 0;
+                padding: 40px 24px;
+            }
+        }
+    </style>
+</head>
+
+<body class="doc-body">
+
+    <div class="doc-container">
+        
+        <!-- SIDEBAR NAVIGATION -->
+        <aside class="doc-sidebar">
+            <div class="doc-sidebar-top">
+                <div class="doc-sidebar-header">
+                    <a href="index.html" class="doc-sidebar-logo" style="text-decoration: none;">THE TV BOOM</a>
+                    <div class="doc-sidebar-subtitle">Project Documentation</div>
+                </div>
+                <nav class="doc-nav">
+                    <ul class="doc-nav-list">
+                        <li><a href="#summary" class="doc-nav-link active">1. Summary & Flow</a></li>
+                        <li><a href="#chart-spending" class="doc-nav-link">2. Line/Area Chart</a></li>
+                        <li><a href="#chart-map" class="doc-nav-link">3. Talent Flow Map</a></li>
+                        <li><a href="#chart-valuation" class="doc-nav-link">4. Valuation Explosion</a></li>
+                        <li><a href="#chart-position" class="doc-nav-link">5. Positional Investment</a></li>
+                        <li><a href="#datasource" class="doc-nav-link">6. Data Source</a></li>
+                        <li><a href="#architecture" class="doc-nav-link">7. Tech Architecture</a></li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="doc-sidebar-footer">
+                <a href="index.html" class="btn-top" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; width: 100%;">
+                    ← Back to Story
+                </a>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT PANEL -->
+        <main class="doc-main">
+            
+            <!-- HEADER SECTION -->
+            <header class="doc-header">
+                <span class="doc-badge">Unified Project Guide</span>
+                <h1>How We Built the TV Boom Visualizations</h1>
+                <p class="lead">A comprehensive walkthrough detailing the project's data narrative and the custom-engineered D3.js and Scrollama.js mechanics used to bring the numbers to life.</p>
+            </header>
+
+            <!-- SECTION 1: EXECUTIVE NARRATIVE FLOW -->
+            <section id="summary" class="doc-section">
+                <h2>Project Summary & Story Flow</h2>
+                <p class="doc-section-desc">This project serves as a financial biography of modern English football. Below is the chronological sequence of the narrative, illustrating how the data story unfolds:</p>
+                
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">
+                                <span>The Calm Before the Storm</span>
+                                <span class="timeline-era pre">Pre-2013</span>
+                            </div>
+                            <div class="timeline-text">
+                                The story opens in the <strong>Pre-TV Era</strong>. Premier League clubs operated under traditional budget constraints. Spending grew at a slow, predictable rate, and total league transfers hovered below £500M annually. Players were valuable, but prices remained tethered to traditional, self-sustaining club revenues.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item highlight">
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">
+                                <span>The Financial Spark</span>
+                                <span class="timeline-era post">2013</span>
+                            </div>
+                            <div class="timeline-text">
+                                The tipping point: A record-breaking domestic <strong>television rights deal</strong> injects billions of pounds from broadcasters directly into Premier League club coffers. This sudden wave of cash instantly changes club budgets, causing an immediate, vertical spike in transfer market liquidity.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">
+                                <span>Mapping the Talent Influx</span>
+                                <span class="timeline-era post">Post-2013</span>
+                            </div>
+                            <div class="timeline-text">
+                                Armed with deep pockets, English clubs scour the globe for the finest players. The project maps this <strong>Talent Influx</strong> geographically, visualizing the major trade corridors (primarily from France, Spain, Germany, Italy, and Brazil) that established England as the financial epicenter of world football.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item highlight">
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">
+                                <span>Valuation Explosion</span>
+                                <span class="timeline-era post">2013-2025</span>
+                            </div>
+                            <div class="timeline-text">
+                                Hyper-inflation hits the transfer market. Because many rich clubs are chasing the same elite players, player prices skyrocket. The <strong>average player transfer fee increases by 190%</strong>, rising from £5.43M to £15.77M. Mid-tier signings suddenly command fees that would have broken records a decade prior.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">
+                                <span>Investment by Position</span>
+                                <span class="timeline-era post">2013-2025</span>
+                            </div>
+                            <div class="timeline-text">
+                                Where did all this cash go? The project concludes by analyzing <strong>Positional Investment</strong>. While forwards and attackers continue to demand premium fees, investment in defensive lines (defenders and goalkeepers) shows massive percentage gains, illustrating that inflation raised the value of entire squads.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 2: LINE & AREA CHART -->
+            <section id="chart-spending" class="doc-section">
+                <h2>1. Transfer Spending Line & Area Chart</h2>
+                <p class="doc-section-desc">Visually representing the transition from the pre-TV era (Chapter 1) to the post-TV era (Chapter 2) using a continuous timeline.</p>
+                
+                <div class="doc-card">
+                    <div class="card-header-bar">
+                        <span class="card-title">Pre- vs. Post-TV Spending Visual</span>
+                        <span class="card-chapters">Chapters 1 & 2 • js/chapter4.js</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-subsection">
+                            <div class="subsection-title insight">
+                                Narrative & Visual Insight
+                            </div>
+                            <div class="card-text">
+                                This visualization traces Premier League spending over a 25-year period. The pre-TV era (2000–2012) is rendered in <strong>cyan</strong>, depicting a flat and stable trend line. As the user scrolls into the post-TV rights boom, an animated gold dot sweeps across the graph, drawing the post-2013 spending line and filling the area beneath it in translucent <strong>gold</strong>. This animation runs dynamically in both directions: scrolling downwards draws the surge, while scrolling upwards erases it, reinforcing the direct impact of the 2013 broadcasting deal.
+                            </div>
+                        </div>
+                        
+                        <div class="card-subsection">
+                            <div class="subsection-title engineering">
+                                Technical Implementation
+                            </div>
+                            <div class="card-text">
+                                The chart maps Pre-TV and Post-TV CSV datasets. To create a continuous path, the last data point of the Pre-TV array is prepended to the Post-TV array. We hide the Post-TV elements initially using an SVG <code>&lt;clipPath&gt;</code> mask.
+                                <br><br>
+                                As Scrollama registers scroll progress through Chapter 2, it triggers a custom transition tween. The width of the clip path rectangle increases dynamically based on the current horizontal coordinate of the path, while a tracer circle is positioned at the intersection point.
+                                
+                                <div class="tech-spec">
+                                    <div class="tech-spec-label">D3 Clipping & Tweening Implementation</div>
+                                    // Set up the mask in SVG defs
+                                    const clipRect = clipPath.append("rect")
+                                        .attr("x", xScale(2012))
+                                        .attr("width", 0); // hidden initially
+
+                                    // During scroll-linked count-up animation:
+                                    t => {
+                                        // Interpolate point coordinate along the post-TV path length
+                                        const point = postPath.node().getPointAtLength(t * totalLength);
+                                        runningDot.attr("cx", point.x).attr("cy", point.y);
+                                        clipRect.attr("width", Math.max(0, point.x - xScale(2012)));
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="interactive-feature">
+                            <strong>Interactive Detail:</strong> Standard tooltips are integrated so users can hover over any individual season marker dot to inspect exact annual spending figures in millions/billions.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 3: TALENT FLOW MAP -->
+            <section id="chart-map" class="doc-section">
+                <h2>2. Global Transfer Flow Map</h2>
+                <p class="doc-section-desc">Visualizing the geographic movement and transfer volume of players moving into and out of England.</p>
+                
+                <div class="doc-card gold-hover">
+                    <div class="card-header-bar">
+                        <span class="card-title">Talent Influx Map Visual</span>
+                        <span class="card-chapters">Chapter 3 • js/chapter6.js</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-subsection">
+                            <div class="subsection-title insight">
+                                Narrative & Visual Insight
+                            </div>
+                            <div class="card-text">
+                                To represent the global reach of the Premier League's financial dominance, this visual maps the movement of players across countries. England is highlighted as the center of player movement, with active partner nations shaded in dark blue.
+                                <br><br>
+                                Curved paths flow between countries, with <strong>cyan lines</strong> indicating players bought by English clubs and <strong>gold lines</strong> representing players sold abroad. Animated particle dashes slide continuously along these paths, showing the direction of flow. Hovering over a country highlights its borders and dims unrelated paths, while tooltips list top players traded, transfer counts, and cumulative fees.
+                            </div>
+                        </div>
+                        
+                        <div class="card-subsection">
+                            <div class="subsection-title engineering">
+                                Technical Implementation
+                            </div>
+                            <div class="card-text">
+                                The map loads a custom GeoJSON world dataset and translates geographic coordinates into SVG space using a Mercator projection centered to emphasize Europe and the Americas.
+                                <br><br>
+                                Instead of drawing straight lines, we construct curved quadratic Bezier paths. By calculating the midpoint between England and a partner nation, we apply a perpendicular offset vector to bend the curve. To animate flows, we duplicate the path and apply a moving CSS dash-offset.
+                                
+                                <div class="tech-spec">
+                                    <div class="tech-spec-label">Bezier Curve and CSS Dash Animation</div>
+                                    // Curved path data generator (SVG Quadratic Bezier)
+                                    const pathData = `M ${source[0]},${source[1]} Q ${bendX},${bendY} ${target[0]},${target[1]}`;
+
+                                    // CSS animation applied to the dashed flow overlay
+                                    .flow-animation-line {
+                                        stroke-linecap: round;
+                                        stroke-dasharray: 6 15;
+                                        animation: flow-dash 1.8s linear infinite;
+                                    }
+                                    @keyframes flow-dash {
+                                        to { stroke-dashoffset: -42; }
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="interactive-feature">
+                            <strong>Zoom & Interaction:</strong> Users can pan and zoom using the mouse wheel or control buttons (implemented via <code>d3.zoom()</code>). Clicking a country automatically centers and zooms into its bounding box, while clicking the map background resets the view.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 4: VALUATION EXPLOSION -->
+            <section id="chart-valuation" class="doc-section">
+                <h2>3. Valuation Explosion Indicator</h2>
+                <p class="doc-section-desc">Comparing average player valuations pre- and post-TV rights boom through a scroll-triggered counting card.</p>
+                
+                <div class="doc-card">
+                    <div class="card-header-bar">
+                        <span class="card-title">Average Fee Valuation Card</span>
+                        <span class="card-chapters">Chapter 4 • js/chapter7.js</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-subsection">
+                            <div class="subsection-title insight">
+                                Narrative & Visual Insight
+                            </div>
+                            <div class="card-text">
+                                This component isolates player valuation inflation. It presents a large glassmorphic circular card centered in the viewport.
+                                <br><br>
+                                In the Pre-TV era, the card shows a calm cyan border and lists the average transfer fee at <strong>£5.43 Million</strong>. As the user scrolls down, the number rapidly counts up, stopping at <strong>£15.77 Million</strong>. Simultaneously, the border glow transitions from cyan to gold, and a gold subtitle fades in, reading <strong>"+190% Growth"</strong>. Scrolling back up reverses the animation, counting the fee back down.
+                            </div>
+                        </div>
+                        
+                        <div class="card-subsection">
+                            <div class="subsection-title engineering">
+                                Technical Implementation
+                            </div>
+                            <div class="card-text">
+                                Rather than binding data to coordinates, this visualization interpolates raw numeric values. D3's transition engine parses the text values and counts up or down using the custom tween function.
+                                <br><br>
+                                The glow ring and text color are transitioned concurrently between the CSS variables <code>--accent-cyan</code> and <code>--accent-gold</code>.
+                                
+                                <div class="tech-spec">
+                                    <div class="tech-spec-label">D3 Numeric Interpolation</div>
+                                    // Dynamically counting up numbers on scroll enter
+                                    feeText.transition()
+                                        .duration(1500)
+                                        .ease(d3.easeQuadOut)
+                                        .textTween(function() {
+                                            const currentVal = parseFeeText(feeText.text()); // parse current text
+                                            const interpolator = d3.interpolateNumber(currentVal, post); // interpolate to target
+                                            return t => `£${(interpolator(t) / 1000000).toFixed(2)}M`;
+                                        });
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="interactive-feature">
+                            <strong>Interruptible Animations:</strong> All transitions are configured to allow interruptions. If a user scrolls quickly back and forth, the current animation stops and begins interpolating from its exact current state, preventing visual stutter.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 5: POSITIONAL INVESTMENT -->
+            <section id="chart-position" class="doc-section">
+                <h2>4. Investment by Position</h2>
+                <p class="doc-section-desc">Analyzing which positions received the most cash injections using stacked horizontal bars.</p>
+                
+                <div class="doc-card gold-hover">
+                    <div class="card-header-bar">
+                        <span class="card-title">Positional Spending Bar Chart</span>
+                        <span class="card-chapters">Chapter 5 • js/chapter8.js</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-subsection">
+                            <div class="subsection-title insight">
+                                Narrative & Visual Insight
+                            </div>
+                            <div class="card-text">
+                                This final visual breaks down where the TV rights cash was spent by position (Forwards, Midfielders, Defenders, Goalkeepers).
+                                <br><br>
+                                It is presented as a stacked horizontal bar chart. The <strong>cyan bars</strong> represent the baseline Pre-TV spending. On scroll, <strong>gold bars</strong> grow outward from the end of the cyan segments, representing the Post-TV spending surge. A percentage growth indicator (e.g., +158% for defenders) fades in at the center of the gold segments, and the cumulative spending total label slides smoothly to the end of the bars.
+                            </div>
+                        </div>
+                        
+                        <div class="card-subsection">
+                            <div class="subsection-title engineering">
+                                Technical Implementation
+                            </div>
+                            <div class="card-text">
+                                This stacked bar layout utilizes a linear x-scale mapped to the combined sum of pre- and post-spending values.
+                                <br><br>
+                                The post-TV bar starts with an initial width of 0 and an x position of <code>xScale(d.pre)</code>. During transition, we animate its width to <code>xScale(d.post)</code>. The labels are animated to slide along with the growing bar to maintain coordinate alignment.
+                                
+                                <div class="tech-spec">
+                                    <div class="tech-spec-label">Coordinated SVG Transitions</div>
+                                    // 1. Grow post bars width
+                                    postBars.transition().duration(1500).attr("width", d => xScale(d.post));
+
+                                    // 2. Co-ordinate total label text and slide its x position
+                                    totalLabels.transition().duration(1500)
+                                        .attr("x", d => xScale(d.pre + d.post) + 8)
+                                        .textTween(function(d) {
+                                            const interpolator = d3.interpolateNumber(d.pre, d.pre + d.post);
+                                            return t => formatLabelValue(interpolator(t));
+                                        });
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 6: DATA SOURCE & METHODOLOGY -->
+            <section id="datasource" class="doc-section">
+                <h2>Data Source & Methodology</h2>
+                <p class="doc-section-desc">Details regarding the data origins, source, and criteria used for the visualizations in this project.</p>
+                
+                <div class="interactive-feature">
+                    <strong>Source Citation:</strong> All transfer market statistics, player values, and volume movements visualized in this project were retrieved from the <strong>Transfermarkt</strong> website.
+                </div>
+                
+                <div class="card-text" style="margin-top: 20px;">
+                    To ensure analytical integrity and reflect the direct financial flow of the television rights boom, the following parameters were applied to the dataset:
+                    <ul>
+                        <li><strong>Paid Transfers Only:</strong> The analysis includes exclusively transfer deals between clubs that involved a financial transfer fee.</li>
+                        <li><strong>Free Transfers Excluded:</strong> Free agent signings, player loan deals, and player swaps without monetary exchange are completely excluded. This ensures the data represents direct cash flows between clubs.</li>
+                        <li><strong>Currency Uniformity:</strong> All transfer values are computed and expressed in British Pounds Sterling (£).</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- SECTION 7: SYSTEM ARCHITECTURE -->
+            <section id="architecture" class="doc-section">
+                <h2>Core Architecture & Libraries</h2>
+                <p class="doc-section-desc">How three simple front-end technologies are integrated to create a modern scrollytelling experience.</p>
+                
+                <div class="tech-grid">
+                    <div class="tech-card">
+                        <div class="tech-card-title">D3.js (v7)</div>
+                        <div class="tech-card-desc">Used for data binding, scaling, drawing vector SVGs, and animating geometric properties. It handles custom color transitions, number counts, and map projections.</div>
+                    </div>
+                    <div class="tech-card">
+                        <div class="tech-card-title">Scrollama.js</div>
+                        <div class="tech-card-desc">A scroll-driven scrollytelling library. It monitors container steps as they enter the screen, triggering transitions. It also tracks exact scroll percentages (0.0 to 1.0) to sync animations with user scroll speed.</div>
+                    </div>
+                    <div class="tech-card">
+                        <div class="tech-card-title">CSS Grid & Flexbox</div>
+                        <div class="tech-card-desc">Lays out the application. The charts remain locked in the center of the viewport via a sticky visual wrapper (<code>position: sticky;</code>), while the textual story cards scroll over them.</div>
+                    </div>
+                </div>
+
+                <div class="interactive-feature" style="margin-top: 30px;">
+                    <strong>Design Theme:</strong> The project uses a glassmorphism aesthetic, featuring dark radial gradients, high-contrast typography (using the premium Google Font <strong>Outfit</strong>), and subtle translucent borders to make the layout feel polished.
+                </div>
+            </section>
+
+            <!-- FOOTER WITH REDIRECT BUTTON -->
+            <footer style="margin-top: 60px; border-top: 1px solid var(--border-glass); padding-top: 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+                <p style="color: var(--text-muted); font-size: 0.9rem;">England TV Boom Visualization Project • 2026</p>
+                <a href="index.html" class="btn-top" style="text-decoration: none;">
+                    Explore the Visual Story →
+                </a>
+            </footer>
+
+        </main>
+    </div>
+
+    <!-- Scroll tracking script to highlight active sidebar links -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const sections = document.querySelectorAll(".doc-section");
+            const navLinks = document.querySelectorAll(".doc-nav-link");
+
+            window.addEventListener("scroll", () => {
+                let current = "";
+                
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.clientHeight;
+                    // Highlight link when section is scrolled into the top 30% of the viewport
+                    if (pageYOffset >= sectionTop - window.innerHeight * 0.3) {
+                        current = section.getAttribute("id");
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove("active");
+                    if (link.getAttribute("href") === `#${current}`) {
+                        link.classList.add("active");
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
