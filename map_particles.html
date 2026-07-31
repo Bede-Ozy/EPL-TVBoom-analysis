@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE TV BOOM - Map Dynamic Particles</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- Load D3 -->
+    <script src="js/d3.v7.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background-color: var(--bg-dark);
+            margin: 0;
+            font-family: "Outfit", sans-serif;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .header-bar {
+            padding: 15px 30px;
+            background: rgba(15, 23, 42, 0.9);
+            border-bottom: 1px solid var(--border-glass);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(8px);
+            z-index: 10;
+        }
+        .header-title h1 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 40%, var(--accent-cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0 0 4px 0;
+        }
+        .header-title p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+        .map-container {
+            flex: 1;
+            position: relative;
+            background: var(--bg-dark);
+        }
+        #ch6 {
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header-bar">
+        <div class="header-title">
+            <h1>Map Improvement: Volume-Scaled Dynamic Particles</h1>
+            <p>Moving particle speed and path stroke-widths scale dynamically based on flow volume (larger transactions = thicker lines, faster particle flows).</p>
+        </div>
+        <div class="nav-links" style="display: flex; gap: 15px; align-items: center;">
+            <span style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600;">Playground Links:</span>
+            <a href="map_shading.html" style="color: var(--text-primary); font-weight: 600; font-size: 0.85rem; text-decoration: none; padding-bottom: 2px;">1. Shading</a>
+            <a href="map_particles.html" style="color: var(--accent-cyan); font-weight: 800; font-size: 0.85rem; text-decoration: none; border-bottom: 2px solid var(--accent-cyan); padding-bottom: 2px;">2. Particles</a>
+            <a href="map_timeline.html" style="color: var(--text-primary); font-weight: 600; font-size: 0.85rem; text-decoration: none; padding-bottom: 2px;">3. Timeline</a>
+            <a href="map_regions.html" style="color: var(--text-primary); font-weight: 600; font-size: 0.85rem; text-decoration: none; padding-bottom: 2px;">4. Regions</a>
+            <span style="color: var(--border-glass); margin: 0 5px;">|</span>
+            <a href="index.html" class="btn-top" style="text-decoration: none; font-size: 0.85rem;">← Back to Story</a>
+        </div>
+    </div>
+    <div class="map-container">
+        <div id="ch6" class="viz active"></div>
+    </div>
+    <div id="tooltip"></div>
+    
+    <script src="js/chapter6_particles.js"></script>
+</body>
+</html>

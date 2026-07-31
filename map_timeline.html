@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE TV BOOM - Map Timeline Slider</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- Load D3 -->
+    <script src="js/d3.v7.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background-color: var(--bg-dark);
+            margin: 0;
+            font-family: "Outfit", sans-serif;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .header-bar {
+            padding: 15px 30px;
+            background: rgba(15, 23, 42, 0.9);
+            border-bottom: 1px solid var(--border-glass);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(8px);
+            z-index: 10;
+        }
+        .header-title h1 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 40%, var(--accent-cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0 0 4px 0;
+        }
+        .header-title p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+        .map-container {
+            flex: 1;
+            position: relative;
+            background: var(--bg-dark);
+        }
+        #ch6 {
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+        }
+        
+        /* Inline styles for Timeline Controls Dashboard Overlay */
+        .timeline-dashboard {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 500px;
+            max-width: 90%;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .timeline-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .btn-play {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--accent-cyan);
+            border: none;
+            color: var(--bg-dark);
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            box-shadow: 0 0 8px var(--accent-cyan-glow);
+        }
+        
+        .btn-play:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 12px var(--accent-cyan);
+        }
+        
+        .map-slider {
+            flex: 1;
+            accent-color: var(--accent-cyan);
+            cursor: pointer;
+        }
+        
+        .timeline-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .year-label {
+            color: var(--accent-gold);
+            font-weight: 800;
+        }
+        
+        .btn-all {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-primary);
+            padding: 4px 12px;
+            font-size: 0.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 600;
+        }
+        
+        .btn-all:hover {
+            background: var(--accent-cyan);
+            color: var(--bg-dark);
+            border-color: var(--accent-cyan);
+        }
+    </style>
+</head>
+<body>
+    <div class="header-bar">
+        <div class="header-title">
+            <h1>Map Improvement: Interactive Timeline Slider</h1>
+            <p>Select a specific year from 2002 to 2025 to filter and draw transfer flows and active partner countries dynamically. Includes auto-play controls.</p>
+        </div>
+        <div class="nav-links" style="display: flex; gap: 15px; align-items: center;">
+            <span style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600;">Playground Links:</span>
+            <a href="map_shading.html" style="color: var(--text-primary); font-weight: 600; font-size: 0.85rem; text-decoration: none; padding-bottom: 2px;">1. Shading</a>
+            <a href="map_particles.html" style="color: var(--text-primary); font-weight: 600; font-size: 0.85rem; text-decoration: none; padding-bottom: 2px;">2. Particles</a>
+            <a href="map_timeline.html" style="color: var(--accent-cyan); font-weight: 800; font-size: 0.85rem; text-decoration: none; border-bottom: 2px solid var(--accent-cyan); padding-bottom: 2px;">3. Timeline</a>
+            <a href="map_regions.html" style="color: var(--text-primary); font-weight: 600; font-size: 0.85rem; text-decoration: none; padding-bottom: 2px;">4. Regions</a>
+            <span style="color: var(--border-glass); margin: 0 5px;">|</span>
+            <a href="index.html" class="btn-top" style="text-decoration: none; font-size: 0.85rem;">← Back to Story</a>
+        </div>
+    </div>
+    
+    <div class="map-container">
+        <div id="ch6" class="viz active"></div>
+        
+        <!-- Timeline Controls Overlay -->
+        <div class="timeline-dashboard">
+            <div class="timeline-row">
+                <button id="play-btn" class="btn-play">▶</button>
+                <input type="range" id="time-slider" class="map-slider" min="2002" max="2025" value="2025">
+            </div>
+            <div class="timeline-info">
+                <span id="year-info">Year: <span class="year-label">All (2002-2025)</span></span>
+                <button id="all-btn" class="btn-all">Show All Years</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="tooltip"></div>
+    
+    <script src="js/chapter6_timeline.js"></script>
+</body>
+</html>

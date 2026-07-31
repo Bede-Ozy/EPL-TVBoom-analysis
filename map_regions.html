@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE TV BOOM - Map Regional Zoom</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- Load D3 -->
+    <script src="js/d3.v7.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background-color: var(--bg-dark);
+            margin: 0;
+            font-family: "Outfit", sans-serif;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .header-bar {
+            padding: 15px 30px;
+            background: rgba(15, 23, 42, 0.9);
+            border-bottom: 1px solid var(--border-glass);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(8px);
+            z-index: 10;
+        }
+        .header-title h1 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 40%, var(--accent-cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0 0 4px 0;
+        }
+        .header-title p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+        .map-container {
+            flex: 1;
+            position: relative;
+            background: var(--bg-dark);
+        }
+        #ch6 {
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+        }
+        
+        /* CSS for Regional Focus Overlay Controls */
+        .regions-dashboard {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 260px;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .dashboard-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 6px;
+        }
+        
+        .btn-region {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 600;
+            font-family: inherit;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .btn-region:hover {
+            background: var(--accent-cyan);
+            color: var(--bg-dark);
+            border-color: var(--accent-cyan);
+        }
+        
+        .btn-region.reset-btn {
+            background: rgba(244, 185, 66, 0.1);
+            border-color: rgba(244, 185, 66, 0.2);
+            color: var(--accent-gold);
+            justify-content: center;
+        }
+        
+        .btn-region.reset-btn:hover {
+            background: var(--accent-gold);
+            color: var(--bg-dark);
+            border-color: var(--accent-gold);
+        }
+    </style>
+</head>
+<body>
+    <div class="header-bar">
+        <div class="header-title">
+            <h1>Map Improvement: Quick-Focus Regional Filters</h1>
+            <p>Floating HUD shortcuts trigger smooth transition pans and zooms to center the map coordinate projection onto major geographic regions.</p>
+        </div>
+        <div class="nav-links" style="display: flex; gap: 15px; align-items: center;">
+            <span style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600;">Playground Links:</span>
+            <a href="map_shading.html" style="color: var(--text-primary); font-weight: 600; font-size: 0.85rem; text-decoration: none; padding-bottom: 2px;">1. Shading</a>
+            <a href="map_particles.html" style="color: var(--text-primary); font-weight: 600; font-size: 0.85rem; text-decoration: none; padding-bottom: 2px;">2. Particles</a>
+            <a href="map_timeline.html" style="color: var(--text-primary); font-weight: 600; font-size: 0.85rem; text-decoration: none; padding-bottom: 2px;">3. Timeline</a>
+            <a href="map_regions.html" style="color: var(--accent-cyan); font-weight: 800; font-size: 0.85rem; text-decoration: none; border-bottom: 2px solid var(--accent-cyan); padding-bottom: 2px;">4. Regions</a>
+            <span style="color: var(--border-glass); margin: 0 5px;">|</span>
+            <a href="index.html" class="btn-top" style="text-decoration: none; font-size: 0.85rem;">← Back to Story</a>
+        </div>
+    </div>
+    
+    <div class="map-container">
+        <div id="ch6" class="viz active"></div>
+        
+        <!-- Regional Focus Controls Overlay -->
+        <div class="regions-dashboard">
+            <span class="dashboard-label">Focus Region</span>
+            <button id="focus-europe" class="btn-region">Europe <span>➔</span></button>
+            <button id="focus-samerica" class="btn-region">South America <span>➔</span></button>
+            <button id="focus-namerica" class="btn-region">North America <span>➔</span></button>
+            <button id="focus-africa" class="btn-region">Africa <span>➔</span></button>
+            <button id="focus-reset" class="btn-region reset-btn">Reset View</button>
+        </div>
+    </div>
+    
+    <div id="tooltip"></div>
+    
+    <script src="js/chapter6_regions.js"></script>
+</body>
+</html>
