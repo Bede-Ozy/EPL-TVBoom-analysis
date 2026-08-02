@@ -195,7 +195,7 @@ Promise.all([
         .attr("class", "total-label")
         .attr("y", d => yScale(d.position) + yScale.bandwidth() / 2)
         .attr("dy", "0.35em")
-        .style("fill", "white")
+        .style("fill", "var(--text-primary)")
         .style("font-size", "12px")
         .style("font-weight", "600");
 
@@ -219,7 +219,7 @@ Promise.all([
     legend.append("text")
         .attr("x", 22)
         .attr("y", 11)
-        .style("fill", "white")
+        .style("fill", "var(--text-primary)")
         .style("font-size", "12px")
         .text("Pre-TV");
 
@@ -232,7 +232,7 @@ Promise.all([
     legend.append("text")
         .attr("x", 112)
         .attr("y", 11)
-        .style("fill", "white")
+        .style("fill", "var(--text-primary)")
         .style("font-size", "12px")
         .text("Post-TV");
 
@@ -244,7 +244,7 @@ Promise.all([
         .attr("x", width / 2)
         .attr("y", 25)
         .attr("text-anchor", "middle")
-        .style("fill", "white")
+        .style("fill", "var(--text-primary)")
         .style("font-size", "20px")
         .style("font-weight", "bold")
         .text("Investment by Position");

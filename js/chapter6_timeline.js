@@ -275,11 +275,11 @@ Promise.all([
                 const name = d.properties.name;
                 const stats = countryStats[name];
 
-                d3.select(this).style("fill", "#475569");
+                d3.select(this).style("fill", "#94a3b8");
                 
                 let htmlContent = `<strong>${name}</strong>`;
                 if (name === "England") {
-                    htmlContent += `<br><span style='color:#e2e8f0;'>Epicenter of English football transfers.</span>`;
+                    htmlContent += `<br><span style='color:var(--text-muted);'>Epicenter of English football transfers.</span>`;
                 } else if (stats) {
                     htmlContent += `
                         <br>Players Sent to England: <strong>${stats.exportedCount}</strong>
@@ -288,7 +288,7 @@ Promise.all([
                         <br>Total Bought Value: <strong>£${formatFee(stats.importedFee)}</strong>
                     `;
                 } else {
-                    htmlContent += `<br><span style='color:#94a3b8;'>No transfer flows recorded.</span>`;
+                    htmlContent += `<br><span style='color:var(--text-muted);'>No transfer flows recorded.</span>`;
                 }
                 showTooltip(event, htmlContent);
 
@@ -301,10 +301,11 @@ Promise.all([
                 d3.selectAll(".flow-line").style("opacity", 0.03);
                 d3.selectAll(".flow-animation-line").style("opacity", 0);
                 
-                d3.selectAll(`.flow-from-${escapeClass(name)}`).style("opacity", 0.95);
-                d3.selectAll(`.flow-to-${escapeClass(name)}`).style("opacity", 0.95);
-                d3.selectAll(`.flow-anim-from-${escapeClass(name)}`).style("opacity", 0.85);
-                d3.selectAll(`.flow-anim-to-${escapeClass(name)}`).style("opacity", 0.85);
+                const escapedCountry = escapeClass(csvToGeoJsonName(name));
+                d3.selectAll(`.flow-from-${escapedCountry}`).style("opacity", 0.95);
+                d3.selectAll(`.flow-to-${escapedCountry}`).style("opacity", 0.95);
+                d3.selectAll(`.flow-anim-from-${escapedCountry}`).style("opacity", 0.85);
+                d3.selectAll(`.flow-anim-to-${escapedCountry}`).style("opacity", 0.85);
             })
             .on("mouseout", function() {
                 d3.select(this).style("fill", null);
@@ -364,26 +365,26 @@ Promise.all([
                     d3.selectAll(".country").style("opacity", 0.4);
                     d3.selectAll(".country").filter(c => c.properties.name === csvToGeoJsonName(d.from) || c.properties.name === csvToGeoJsonName(d.to))
                         .style("opacity", 1)
-                        .style("fill", "#475569");
+                        .style("fill", "#94a3b8");
 
                     d3.selectAll(".flow-line").filter(l => l !== d).style("opacity", 0.03);
                     d3.selectAll(".flow-animation-line").filter(l => l.datum() !== d).style("opacity", 0);
 
                     const topPlayers = d.players.slice(0, 4).map(p => `
                         <div style="margin-top:4px; font-size:11px; display:flex; justify-content:space-between; gap:10px;">
-                            <span style="color:#f8fafc;">${p.name} (${p.season})</span>
-                            <span style="color:#2ca6a4; font-weight:600;">£${formatFee(p.fee)}</span>
+                            <span style="color:var(--text-primary);">${p.name} (${p.season})</span>
+                            <span style="color:var(--accent-cyan); font-weight:600;">£${formatFee(p.fee)}</span>
                         </div>
                     `).join("");
-
+ 
                     const tooltipHtml = `
-                        <div style="font-weight:600; font-size:13px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom:4px; margin-bottom:6px;">
+                        <div style="font-weight:600; font-size:13px; border-bottom: 1px solid var(--border-glass); padding-bottom:4px; margin-bottom:6px;">
                             ${d.from} ➔ ${d.to}
                         </div>
-                        Total Volume: <strong style="color:#fff;">${d.count} players</strong><br>
-                        Total Fees: <strong style="color:#fff;">£${formatFee(d.totalFee)}</strong>
+                        Total Volume: <strong style="color:var(--text-primary);">${d.count} players</strong><br>
+                        Total Fees: <strong style="color:var(--text-primary);">£${formatFee(d.totalFee)}</strong>
                         <div style="margin-top:10px;">
-                            <div style="font-size:11px; text-transform:uppercase; color:#94a3b8; font-weight:600; letter-spacing:0.5px;">Top Transfers:</div>
+                            <div style="font-size:11px; text-transform:uppercase; color:var(--text-muted); font-weight:600; letter-spacing:0.5px;">Top Transfers:</div>
                             ${topPlayers}
                         </div>
                     `;

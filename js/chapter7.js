@@ -42,8 +42,8 @@ Promise.all([
     // 4. Background circular panel (matching glassmorphism theme)
     cardGroup.append("circle")
         .attr("r", 200)
-        .style("fill", "rgba(30, 41, 59, 0.4)")
-        .style("stroke", "rgba(255, 255, 255, 0.05)")
+        .style("fill", "var(--bg-glass)")
+        .style("stroke", "var(--border-glass)")
         .style("stroke-width", "2px");
 
     // 5. Outer glowing ring that changes color during transitions
@@ -68,7 +68,7 @@ Promise.all([
     const feeText = cardGroup.append("text")
         .attr("y", 10)
         .attr("text-anchor", "middle")
-        .style("fill", "white")
+        .style("fill", "var(--text-primary)")
         .style("font-size", "86px")
         .style("font-weight", "800")
         .style("letter-spacing", "-2px")
@@ -187,16 +187,16 @@ Promise.all([
             .ease(d3.easeQuadOut)
             .styleTween("stroke", function() {
                 const currentStroke = glowCircle.style("stroke");
-                return d3.interpolateRgb(currentStroke, "var(--accent-gold)");
+                return d3.interpolateRgb(currentStroke, "#00c6ff");
             });
-
+ 
         // 5. Interpolate growth text color Cyan -> Gold
         growthText.transition()
             .duration(duration)
             .ease(d3.easeQuadOut)
             .styleTween("fill", function() {
                 const currentFill = growthText.style("fill");
-                return d3.interpolateRgb(currentFill, "var(--accent-gold)");
+                return d3.interpolateRgb(currentFill, "#00c6ff");
             });
     };
 
@@ -256,16 +256,16 @@ Promise.all([
             .ease(d3.easeQuadOut)
             .styleTween("stroke", function() {
                 const currentStroke = glowCircle.style("stroke");
-                return d3.interpolateRgb(currentStroke, "var(--accent-cyan)");
+                return d3.interpolateRgb(currentStroke, "#226ff8");
             });
-
+ 
         // 5. Interpolate growth text color Gold -> Cyan
         growthText.transition()
             .duration(duration)
             .ease(d3.easeQuadOut)
             .styleTween("fill", function() {
                 const currentFill = growthText.style("fill");
-                return d3.interpolateRgb(currentFill, "var(--accent-cyan)");
+                return d3.interpolateRgb(currentFill, "#226ff8");
             });
     };
 

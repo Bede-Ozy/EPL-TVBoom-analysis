@@ -82,7 +82,7 @@ Promise.all([
         .attr("x", width / 2)
         .attr("y", 25)
         .attr("text-anchor", "middle")
-        .style("fill", "white")
+        .style("fill", "var(--text-primary)")
         .style("font-size", "20px")
         .style("font-weight", "bold")
         .text("Premier League Transfer Spending");
@@ -103,7 +103,7 @@ Promise.all([
     const preArea = chart.append("path")
         .datum(pre_tv)
         .attr("d", area)
-        .style("fill", "rgba(44,166,164,0.25)")
+        .style("fill", "rgba(34, 111, 248, 0.15)")
         .style("stroke-width", "none");
 
     const prePath = chart.append("path")
@@ -117,14 +117,14 @@ Promise.all([
     const postArea = chart.append("path")
         .datum(postTVLineData)
         .attr("d", area)
-        .style("fill", "rgba(244,185,66,0.15)") // translucent gold fill
+        .style("fill", "rgba(0, 198, 255, 0.12)") // translucent brand cyan fill
         .style("stroke-width", "none")
         .style("pointer-events", "none");
 
     const postPath = chart.append("path")
         .datum(postTVLineData)
         .attr("d", line)
-        .style("stroke", "var(--accent-gold)") // Gold accent line
+        .style("stroke", "var(--accent-gold)") // Cyan accent line
         .style("stroke-width", "3px")
         .style("fill", "none")
         .style("pointer-events", "none");
@@ -145,7 +145,7 @@ Promise.all([
 
     // 8. Tooltip Line Tracer
     const tracer = chart.append("line")
-        .style("stroke", "white")
+        .style("stroke", "var(--text-primary)")
         .style("stroke-width", 1)
         .style("stroke-dasharray", "4 4")
         .style("opacity", 0);
@@ -192,7 +192,7 @@ Promise.all([
         .attr("cy", d => yScale(d.spend_millions))
         .attr("r", 3)
         .style("fill", "var(--accent-cyan)")
-        .attr("stroke", "white")
+        .attr("stroke", "var(--bg-dark)")
         .attr("stroke-width", 1)
         .style("opacity", 0.6)
         .on("mouseover", showTooltip)
@@ -207,7 +207,7 @@ Promise.all([
         .attr("cy", d => yScale(d.spend_millions))
         .attr("r", 3)
         .style("fill", "var(--accent-gold)")
-        .attr("stroke", "white")
+        .attr("stroke", "var(--bg-dark)")
         .attr("stroke-width", 1)
         .style("opacity", 0) // Starts hidden
         .style("pointer-events", "none")
@@ -220,12 +220,9 @@ Promise.all([
         .attr("x2", xScale(2013))
         .attr("y1", 0)
         .attr("y2", innerHeight)
-        .attr("stroke", "rgba(255,255,255,0.2)")
+        .attr("stroke", "rgba(1, 15, 64, 0.15)")
         .attr("stroke-width", 1)
         .attr("stroke-dasharray", "4,4");
-
-    d3.select("#page_label")
-        .html("TV Boom Begins");
 
     // 11. Orchestrate state transitions
     let lineChartState = "pre"; // Tracker for current visual state
@@ -235,7 +232,7 @@ Promise.all([
         .attr("class", "running-dot")
         .attr("r", 6)
         .style("fill", "var(--accent-gold)")
-        .attr("stroke", "white")
+        .attr("stroke", "var(--bg-dark)")
         .attr("stroke-width", 1.5)
         .style("opacity", 0)
         .style("pointer-events", "none");
@@ -254,7 +251,8 @@ Promise.all([
             runningDot.style("opacity", 0);
             postDots.style("opacity", 0).style("pointer-events", "none");
         } else {
-            clipRect.attr("width", xScale(2025) - xScale(2012));
+            const maxYear = d3.max(allData, d => d.season_start);
+            clipRect.attr("width", xScale(maxYear) - xScale(2012));
             runningDot.style("opacity", 0);
             postDots.style("opacity", 0.6).style("pointer-events", "auto");
         }

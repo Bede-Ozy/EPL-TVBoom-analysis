@@ -17,7 +17,7 @@
         :root {
             --sidebar-width: 280px;
             --code-bg: #0b0f19;
-            --card-hover-border: rgba(44, 166, 164, 0.4);
+            --card-hover-border: rgba(34, 111, 248, 0.4);
             --gradient-accent: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-gold) 100%);
         }
 
@@ -41,8 +41,8 @@
         /* Sidebar Navigation */
         .doc-sidebar {
             width: var(--sidebar-width);
-            background: rgba(15, 23, 42, 0.95);
-            border-right: 1px solid var(--border-glass);
+            background: #010f40;
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
             position: fixed;
             top: 0;
             bottom: 0;
@@ -72,7 +72,7 @@
 
         .doc-sidebar-subtitle {
             font-size: 0.8rem;
-            color: var(--text-muted);
+            color: #94a3b8;
             text-transform: uppercase;
             letter-spacing: 1px;
             font-weight: 600;
@@ -86,7 +86,7 @@
         }
 
         .doc-nav-link {
-            color: var(--text-muted);
+            color: #94a3b8;
             text-decoration: none;
             font-size: 0.95rem;
             font-weight: 500;
@@ -98,10 +98,22 @@
         }
 
         .doc-nav-link:hover, .doc-nav-link.active {
-            color: var(--text-primary);
-            background: rgba(255, 255, 255, 0.03);
-            border-left-color: var(--accent-cyan);
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.05);
+            border-left-color: var(--accent-gold);
             padding-left: 18px;
+        }
+
+        .doc-sidebar .btn-top {
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+            text-align: center;
+        }
+
+        .doc-sidebar .btn-top:hover {
+            background: var(--accent-gold);
+            color: #010f40;
+            box-shadow: 0 0 15px rgba(0, 198, 255, 0.4);
         }
 
         .doc-sidebar-footer {
@@ -201,7 +213,7 @@
             bottom: 0;
             left: 7px;
             width: 2px;
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(1, 15, 64, 0.08);
         }
 
         .timeline-item {
@@ -248,7 +260,7 @@
         }
 
         .timeline-content:hover {
-            border-color: rgba(255,255,255,0.15);
+            border-color: rgba(1, 15, 64, 0.15);
             transform: translateX(4px);
         }
 
@@ -304,12 +316,12 @@
         }
 
         .doc-card.gold-hover:hover {
-            --card-hover-border: rgba(244, 185, 66, 0.4);
+            --card-hover-border: rgba(0, 198, 255, 0.4);
         }
 
         .card-header-bar {
             padding: 20px 24px;
-            background: rgba(15, 23, 42, 0.45);
+            background: rgba(1, 15, 64, 0.03);
             border-bottom: 1px solid var(--border-glass);
             display: flex;
             align-items: center;
@@ -327,7 +339,7 @@
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1px;
-            background: rgba(255,255,255,0.05);
+            background: rgba(1, 15, 64, 0.05);
             padding: 4px 10px;
             border-radius: 4px;
             color: var(--text-muted);

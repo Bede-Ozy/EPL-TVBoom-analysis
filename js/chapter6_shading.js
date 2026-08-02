@@ -179,7 +179,18 @@ Promise.all([
     const maxCountryVolume = d3.max(Object.values(countryStats).filter(s => s.name !== "England"), s => s.exportedFee + s.importedFee) || 1;
     const choroplethScale = d3.scaleLinear()
         .domain([0, maxCountryVolume * 0.1, maxCountryVolume])
-        .range(["#1e293b", "#1b5d8f", "#2ca6a4"]);
+        .range(["#e2e8f0", "#226ff8", "#00c6ff"]);
+
+    // Update legend values dynamically
+    d3.select("#mid-legend-val").text("£" + formatFee(maxCountryVolume * 0.1));
+    d3.select("#max-legend-val").text("£" + formatFee(maxCountryVolume));
+
+    function formatFee(val) {
+        if (val >= 1000000000) return (val / 1000000000).toFixed(2) + "B";
+        if (val >= 1000000) return (val / 1000000).toFixed(1) + "M";
+        if (val >= 1000) return (val / 1000).toFixed(0) + "k";
+        return val > 0 ? val.toString() : "0";
+    }
 
     const tooltip = d3.select("#tooltip");
     function showTooltip(event, content) {
@@ -208,7 +219,7 @@ Promise.all([
         })
         .style("fill", d => {
             const name = d.properties.name;
-            if (name === "England") return "#0f2d4a"; // epicenter dark blue
+            if (name === "England") return "#010f40"; // epicenter brand Navy
             if (countryStats[name]) {
                 const totalVol = countryStats[name].exportedFee + countryStats[name].importedFee;
                 return choroplethScale(totalVol); // scale shading
@@ -224,21 +235,21 @@ Promise.all([
             const name = d.properties.name;
             const stats = countryStats[name];
 
-            d3.select(this).style("fill", "#475569");
+            d3.select(this).style("fill", "#94a3b8");
             
             let htmlContent = `<strong>${name}</strong>`;
             if (name === "England") {
-                htmlContent += `<br><span style='color:#e2e8f0;'>Epicenter of English football transfers.</span>`;
+                htmlContent += `<br><span style='color:var(--text-muted);'>Epicenter of English football transfers.</span>`;
             } else if (stats) {
                 htmlContent += `
                     <br>Players Sent to England: <strong>${stats.exportedCount}</strong>
                     <br>Total Sent Value: <strong>£${formatFee(stats.exportedFee)}</strong>
                     <br>Players Bought from England: <strong>${stats.importedCount}</strong>
                     <br>Total Bought Value: <strong>£${formatFee(stats.importedFee)}</strong>
-                    <br><span style="color:var(--accent-gold); font-size:11px; font-weight:600; display:block; margin-top:5px;">Total Volume: £${formatFee(stats.exportedFee + stats.importedFee)}</span>
+                    <br><span style="color:var(--accent-cyan); font-size:11px; font-weight:700; display:block; margin-top:5px;">Total Volume: £${formatFee(stats.exportedFee + stats.importedFee)}</span>
                 `;
             } else {
-                htmlContent += `<br><span style='color:#94a3b8;'>No transfer flows recorded.</span>`;
+                htmlContent += `<br><span style='color:var(--text-muted);'>No transfer flows recorded.</span>`;
             }
             showTooltip(event, htmlContent);
 
@@ -248,13 +259,14 @@ Promise.all([
                 return 0.05;
             });
 
-            d3.selectAll(".flow-line").style("opacity", 0.03);
+            d3.selectAll(".flow-line").style("opacity", 0);
             d3.selectAll(".flow-animation-line").style("opacity", 0);
             
-            d3.selectAll(`.flow-from-${escapeClass(name)}`).style("opacity", 0.95).style("stroke-width", d => strokeWidthScale(d.totalFee) * 1.5);
-            d3.selectAll(`.flow-to-${escapeClass(name)}`).style("opacity", 0.95).style("stroke-width", d => strokeWidthScale(d.totalFee) * 1.5);
-            d3.selectAll(`.flow-anim-from-${escapeClass(name)}`).style("opacity", 0.85);
-            d3.selectAll(`.flow-anim-to-${escapeClass(name)}`).style("opacity", 0.85);
+            const escapedCountry = escapeClass(csvToGeoJsonName(name));
+            d3.selectAll(`.flow-from-${escapedCountry}`).style("opacity", 0.95).style("stroke-width", d => strokeWidthScale(d.totalFee) * 1.2);
+            d3.selectAll(`.flow-to-${escapedCountry}`).style("opacity", 0.95).style("stroke-width", d => strokeWidthScale(d.totalFee) * 1.2);
+            d3.selectAll(`.flow-anim-from-${escapedCountry}`).style("opacity", 0.85);
+            d3.selectAll(`.flow-anim-to-${escapedCountry}`).style("opacity", 0.85);
         })
         .on("mousemove", function(event) {
             tooltip.style("left", (event.pageX + 15) + "px")
@@ -272,10 +284,10 @@ Promise.all([
                 });
             
             d3.selectAll(".flow-line")
-                .style("opacity", 0.3)
+                .style("opacity", 0)
                 .style("stroke-width", d => strokeWidthScale(d.totalFee));
             d3.selectAll(".flow-animation-line")
-                .style("opacity", 0.7);
+                .style("opacity", 0);
         })
         .on("click", function(event, d) {
             event.stopPropagation();
@@ -334,49 +346,8 @@ Promise.all([
             .attr("d", pathData)
             .attr("class", `flow-line ${flowClass} flow-from-${fromEsc} flow-to-${toEsc}`)
             .style("stroke-width", strokeWidthScale(flow.totalFee))
-            .style("opacity", 0.3)
-            .on("mouseover", function(event, d) {
-                d3.select(this).style("opacity", 0.95).style("stroke-width", strokeWidthScale(d.totalFee) * 1.5);
-                
-                d3.selectAll(".country").style("opacity", 0.4);
-                d3.selectAll(".country").filter(c => c.properties.name === csvToGeoJsonName(d.from) || c.properties.name === csvToGeoJsonName(d.to))
-                    .style("opacity", 1)
-                    .style("fill", "#475569");
-
-                d3.selectAll(".flow-line").filter(l => l !== d).style("opacity", 0.03);
-                d3.selectAll(".flow-animation-line").filter(l => l.datum() !== d).style("opacity", 0);
-
-                const topPlayers = d.players.slice(0, 4).map(p => `
-                    <div style="margin-top:4px; font-size:11px; display:flex; justify-content:space-between; gap:10px;">
-                        <span style="color:#f8fafc;">${p.name} (${p.season})</span>
-                        <span style="color:#2ca6a4; font-weight:600;">£${formatFee(p.fee)}</span>
-                    </div>
-                `).join("");
-
-                const tooltipHtml = `
-                    <div style="font-weight:600; font-size:13px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom:4px; margin-bottom:6px;">
-                        ${d.from} ➔ ${d.to}
-                    </div>
-                    Total Volume: <strong style="color:#fff;">${d.count} players</strong><br>
-                    Total Fees: <strong style="color:#fff;">£${formatFee(d.totalFee)}</strong>
-                    <div style="margin-top:10px;">
-                        <div style="font-size:11px; text-transform:uppercase; color:#94a3b8; font-weight:600; letter-spacing:0.5px;">Top Transfers:</div>
-                        ${topPlayers}
-                    </div>
-                `;
-                showTooltip(event, tooltipHtml);
-            })
-            .on("mousemove", function(event) {
-                tooltip.style("left", (event.pageX + 15) + "px")
-                    .style("top", (event.pageY - 20) + "px");
-            })
-            .on("mouseout", function(event, d) {
-                d3.select(this).style("stroke-width", strokeWidthScale(d.totalFee)).style("opacity", 0.3);
-                d3.selectAll(".country").style("opacity", null).style("fill", null);
-                d3.selectAll(".flow-line").style("opacity", 0.3).style("stroke-width", d => strokeWidthScale(d.totalFee));
-                d3.selectAll(".flow-animation-line").style("opacity", 0.7);
-                hideTooltip();
-            });
+            .style("opacity", 0)
+            .style("pointer-events", "none");
 
         // Animated particles (regular parameters)
         flowsGroup.append("path")
@@ -384,7 +355,8 @@ Promise.all([
             .attr("d", pathData)
             .attr("class", `flow-animation-line ${flowClass} flow-anim-from-${fromEsc} flow-anim-to-${toEsc}`)
             .style("stroke-width", 1.2)
-            .style("opacity", 0.7);
+            .style("opacity", 0)
+            .style("pointer-events", "none");
     });
 
     // 5. Standard zoom HUD widgets
