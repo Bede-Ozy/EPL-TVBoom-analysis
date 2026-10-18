@@ -183,13 +183,6 @@ Promise.all([
     const strokeWidthScaleBg = d3.scaleSqrt().domain([0, maxFee]).range([1.0, 5.0]);
     const strokeWidthScaleParticle = d3.scaleSqrt().domain([0, maxFee]).range([2.5, 8.0]);
 
-    function formatFee(val) {
-        if (val >= 1000000000) return (val / 1000000000).toFixed(2) + "B";
-        if (val >= 1000000) return (val / 1000000).toFixed(1) + "M";
-        if (val >= 1000) return (val / 1000).toFixed(0) + "k";
-        return val > 0 ? val.toString() : "0";
-    }
-
     const tooltip = d3.select("#tooltip");
     function showTooltip(event, content) {
         tooltip.style("opacity", 1)
@@ -201,7 +194,11 @@ Promise.all([
         tooltip.style("opacity", 0);
     }
 
-    // Draw countries using original static theme shading
+    function escapeClass(val) {
+        return val.replace(/[^a-zA-Z0-9]/g, "-");
+    }
+
+    // Draw countries using static theme shading
     mapGroup.append("g")
         .attr("class", "countries-layer")
         .selectAll("path")
@@ -288,10 +285,6 @@ Promise.all([
                 .call(zoom.transform, d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale));
         });
 
-    function escapeClass(val) {
-        return val.replace(/[^a-zA-Z0-9]/g, "-");
-    }
-
     svg.on("click", () => {
         svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity);
     });
@@ -375,7 +368,7 @@ Promise.all([
                 hideTooltip();
             });
 
-        // 3. Dynamic scale speed and width of particle flows
+        // Dynamic scale speed and width of particle flows
         // Symmetrical: larger volume = faster speed (shorter duration) & thicker stroke
         const particleDuration = d3.scaleLinear()
             .domain([0, maxFee])
@@ -395,13 +388,14 @@ Promise.all([
             .style("opacity", particleOpacity);
     });
 
-    // Standard Zoom HUD controls
+    // Zoom HUD controls
     const controls = container.append("div")
         .attr("class", "zoom-controls");
 
     controls.append("button")
         .attr("class", "zoom-btn")
         .html("+")
+        .attr("title", "Zoom In")
         .on("click", (event) => {
             event.stopPropagation();
             svg.transition().duration(300).call(zoom.scaleBy, 1.5);
@@ -410,6 +404,7 @@ Promise.all([
     controls.append("button")
         .attr("class", "zoom-btn")
         .html("-")
+        .attr("title", "Zoom Out")
         .on("click", (event) => {
             event.stopPropagation();
             svg.transition().duration(300).call(zoom.scaleBy, 0.75);
@@ -418,6 +413,7 @@ Promise.all([
     controls.append("button")
         .attr("class", "zoom-btn")
         .html("⟲")
+        .attr("title", "Reset Zoom")
         .on("click", (event) => {
             event.stopPropagation();
             svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity);

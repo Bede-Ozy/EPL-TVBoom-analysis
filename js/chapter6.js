@@ -1,60 +1,48 @@
 /**
- * Chapter 6: Global Transfer Flow Map
+ * Chapter 6: Global Transfer Flow Map with Volume-Scaled Dynamic Particles
  * 
  * This file sets up a D3 world map projection and visualizes the movement of players
- * into and out of England. Instead of drawing thousands of separate lines, the transfers
- * are aggregated by country pair to show volume and total spending.
+ * into and out of England. Flow curve stroke-widths and particle animation durations
+ * scale dynamically relative to transaction fees (higher volume = thicker lines,
+ * faster particle flows).
  */
 
 // 1. Load the world map geometry and the transfer flow dataset
-// Note: Path is relative to the HTML document loading this script (index.html)
 Promise.all([
     d3.json("data/world.geojson"),
     d3.csv("data/ch6_transfer_flow.csv"),
     d3.csv("data/ch6_transfer_out_flow.csv")
 ]).then(([world, transfersIn, transfersOut]) => {
 
-    // Used only to draw the map
-    const flowData = transfersIn;
-
-    // Used only to calculate tooltip statistics
     const allTransfers = [...transfersIn, ...transfersOut];
-
-    console.log("Chapter 6: Initializing Transfer Flow Map");
-
-    // 2. Select container and calculate dimensions
     const container = d3.select("#ch6");
     const width = container.node().clientWidth || 960;
     const height = container.node().clientHeight || 600;
 
-    // 3. Create SVG element with responsive viewBox
+    // 2. Create SVG element with responsive viewBox
     const svg = container.append("svg")
         .attr("viewBox", `0 0 ${width} ${height}`)
         .attr("preserveAspectRatio", "xMidYMid meet");
 
-    // 4. Set up a zoom behavior and attach it to a main "g" container.
-    // This allows panning and zooming the map using mouse scroll or dragging.
     const mapGroup = svg.append("g");
 
+    // 3. Set up zoom behavior
     const zoom = d3.zoom()
-        .scaleExtent([1, 8]) // limit zoom level from 1x to 8x
+        .scaleExtent([1, 8])
         .on("zoom", (event) => {
             mapGroup.attr("transform", event.transform);
         });
 
     svg.call(zoom);
 
-    // 5. Define Map Projection and Path Generator
-    // We use a Mercator projection, centered around longitude 0, latitude 35 to focus on Europe/Americas
+    // 4. Map projection & path generator
     const projection = d3.geoMercator()
         .scale(150)
         .translate([width / 2, height / 1.4]);
 
-    const path = d3.geoPath()
-        .projection(projection);
+    const path = d3.geoPath().projection(projection);
 
-    // 6. Coordinates dictionary for country centers
-    // Maps each country in the dataset to [longitude, latitude]
+    // 5. Coordinates dictionary for country centers [longitude, latitude]
     const countryCoords = {
         "England": [-1.2649062, 52.5310214],
         "Spain": [-4.8379791, 39.3260685],
@@ -118,7 +106,6 @@ Promise.all([
         "Saudi Arabia": [42.352833, 25.624262]
     };
 
-    // Helper to resolve coordinates including spelling mismatches
     function getCoords(countryName) {
         if (countryName === "USA") return countryCoords["United States"];
         if (countryName === "South Korea") return countryCoords["Korea, South"];
@@ -130,7 +117,6 @@ Promise.all([
         return countryCoords[countryName];
     }
 
-    // Helper mapping CSV names to GeoJSON country identifiers
     function csvToGeoJsonName(name) {
         if (name === "England" || name === "Scotland" || name === "Wales" || name === "Northern Ireland") {
             return "England";
@@ -143,106 +129,6 @@ Promise.all([
         return name;
     }
 
-    // 7. Aggregate individual transfers into country-to-country flows
-    const flows = [];
-    const flowMap = {};
-    const countryStats = {}; // Tracks totals for each country
-
-    flowData.forEach(d => {
-        const from = d.from_country;
-        const to = d.to_country;
-        
-        // Ignore domestic transfers within England
-        if (from === "England" && to === "England") return;
-        if (!from || !to) return;
-
-        const fee = +d.fee_clean || 0;
-        const key = `${from}->${to}`;
-
-        // Initialize unique flow records
-        if (!flowMap[key]) {
-            flowMap[key] = {
-                from: from,
-                to: to,
-                count: 0,
-                totalFee: 0,
-                players: []
-            };
-            flows.push(flowMap[key]);
-        }
-
-        flowMap[key].count += 1;
-        flowMap[key].totalFee += fee;
-        flowMap[key].players.push({
-            name: d.player_name,
-            fee: fee,
-            season: d.season_start,
-            position: d.player_position
-        });
-
-        // // Accumulate country statistics
-        // const mappedFrom = csvToGeoJsonName(from);
-        // const mappedTo = csvToGeoJsonName(to);
-
-        // if (!countryStats[mappedFrom]) {
-        //     countryStats[mappedFrom] = { name: mappedFrom, exportedCount: 0, exportedFee: 0, importedCount: 0, importedFee: 0 };
-        // }
-        // countryStats[mappedFrom].exportedCount += 1;
-        // countryStats[mappedFrom].exportedFee += fee;
-
-        // if (!countryStats[mappedTo]) {
-        //     countryStats[mappedTo] = { name: mappedTo, exportedCount: 0, exportedFee: 0, importedCount: 0, importedFee: 0 };
-        // }
-        // countryStats[mappedTo].importedCount += 1;
-        // countryStats[mappedTo].importedFee += fee;
-    });
-
-    allTransfers.forEach(d => {
-
-        const from = csvToGeoJsonName(d.from_country);
-        const to = csvToGeoJsonName(d.to_country);
-        const fee = +d.fee_clean || 0;
-
-        if (!countryStats[from]) {
-            countryStats[from] = {
-                name: from,
-                exportedCount: 0,
-                exportedFee: 0,
-                importedCount: 0,
-                importedFee: 0
-            };
-        }
-
-        countryStats[from].exportedCount++;
-        countryStats[from].exportedFee += fee;
-
-        if (!countryStats[to]) {
-            countryStats[to] = {
-                name: to,
-                exportedCount: 0,
-                exportedFee: 0,
-                importedCount: 0,
-                importedFee: 0
-            };
-        }
-
-        countryStats[to].importedCount++;
-        countryStats[to].importedFee += fee;
-
-    });
-
-    // Sort players in each flow by fee descending
-    flows.forEach(f => {
-        f.players.sort((a, b) => b.fee - a.fee);
-    });
-
-    // 8. Scales for line thickness based on total flow size
-    const maxFee = d3.max(flows, f => f.totalFee);
-    const strokeWidthScale = d3.scaleSqrt()
-        .domain([0, maxFee])
-        .range([1.2, 7]); // Line width will vary from 1.2px to 7px depending on total volume
-
-    // Helper formatting money values
     function formatFee(val) {
         if (val >= 1000000000) return (val / 1000000000).toFixed(2) + "B";
         if (val >= 1000000) return (val / 1000000).toFixed(1) + "M";
@@ -250,22 +136,77 @@ Promise.all([
         return val > 0 ? val.toString() : "0";
     }
 
-    // 9. Tooltip Helpers
-    const tooltip = d3.select("#tooltip");
+    // 6. Aggregate transfers into country flows and country statistics
+    const flows = [];
+    const flowMap = {};
+    const countryStats = {};
 
+    transfersIn.forEach(d => {
+        const from = d.from_country;
+        const to = d.to_country;
+        if (from === "England" && to === "England") return;
+        if (!from || !to) return;
+
+        const fee = +d.fee_clean || 0;
+        const key = `${from}->${to}`;
+
+        if (!flowMap[key]) {
+            flowMap[key] = { from, to, count: 0, totalFee: 0, players: [] };
+            flows.push(flowMap[key]);
+        }
+        flowMap[key].count++;
+        flowMap[key].totalFee += fee;
+        flowMap[key].players.push({
+            name: d.player_name,
+            fee: fee,
+            season: d.season_start,
+            position: d.player_position
+        });
+    });
+
+    allTransfers.forEach(d => {
+        const from = csvToGeoJsonName(d.from_country);
+        const to = csvToGeoJsonName(d.to_country);
+        const fee = +d.fee_clean || 0;
+
+        if (!countryStats[from]) {
+            countryStats[from] = { name: from, exportedCount: 0, exportedFee: 0, importedCount: 0, importedFee: 0 };
+        }
+        countryStats[from].exportedCount++;
+        countryStats[from].exportedFee += fee;
+
+        if (!countryStats[to]) {
+            countryStats[to] = { name: to, exportedCount: 0, exportedFee: 0, importedCount: 0, importedFee: 0 };
+        }
+        countryStats[to].importedCount++;
+        countryStats[to].importedFee += fee;
+    });
+
+    flows.forEach(f => f.players.sort((a, b) => b.fee - a.fee));
+
+    // 7. Dynamic Scales: Background curve stroke-widths and particle widths & speeds
+    const maxFee = d3.max(flows, f => f.totalFee) || 1;
+    const strokeWidthScaleBg = d3.scaleSqrt().domain([0, maxFee]).range([1.0, 5.0]);
+    const strokeWidthScaleParticle = d3.scaleSqrt().domain([0, maxFee]).range([2.5, 8.0]);
+
+    // 8. Tooltip helpers
+    const tooltip = d3.select("#tooltip");
     function showTooltip(event, content) {
         tooltip.style("opacity", 1)
             .html(content)
             .style("left", (event.pageX + 15) + "px")
             .style("top", (event.pageY - 20) + "px");
     }
-
     function hideTooltip() {
         tooltip.style("opacity", 0);
     }
 
-    // 10. Draw Countries on the Map
-    const countries = mapGroup.append("g")
+    function escapeClass(val) {
+        return val.replace(/[^a-zA-Z0-9]/g, "-");
+    }
+
+    // 9. Draw countries layer
+    mapGroup.append("g")
         .attr("class", "countries-layer")
         .selectAll("path")
         .data(world.features)
@@ -274,21 +215,21 @@ Promise.all([
         .attr("d", path)
         .attr("class", d => {
             const name = d.properties.name;
-            if (name === "England") {
-                return "country epicenter"; // Color the epicenter (UK/England) uniquely
-            }
-            if (countryStats[name]) {
-                return "country active-partner"; // Highlights countries that trade players with England
-            }
-            return "country"; // Standard color for other countries
+            if (name === "England") return "country epicenter";
+            if (countryStats[name]) return "country active-partner";
+            return "country";
+        })
+        .style("opacity", d => {
+            const name = d.properties.name;
+            if (name === "England") return 1.0;
+            return countryStats[name] ? 1.0 : 0.15;
         })
         .on("mouseover", function(event, d) {
             const name = d.properties.name;
             const stats = countryStats[name];
 
-            d3.select(this).style("fill", "#94a3b8"); // Highlight country boundary
+            d3.select(this).style("fill", "#94a3b8");
             
-            // Build rich info popup
             let htmlContent = `<strong>${name}</strong>`;
             if (name === "England") {
                 htmlContent += `<br><span style='color:var(--text-muted);'>Epicenter of English football transfers.</span>`;
@@ -304,14 +245,18 @@ Promise.all([
             }
             showTooltip(event, htmlContent);
 
-            // Highlight connected flow lines, dim everything else
+            d3.selectAll(".countries-layer path").style("opacity", d => {
+                const cname = d.properties.name;
+                if (cname === name || cname === "England") return 1.0;
+                return 0.05;
+            });
+
             d3.selectAll(".flow-line").style("opacity", 0.03);
             d3.selectAll(".flow-animation-line").style("opacity", 0);
             
             const escapedCountry = escapeClass(csvToGeoJsonName(name));
-            d3.selectAll(`.flow-from-${escapedCountry}`).style("opacity", 0.95).style("stroke-width", d => strokeWidthScale(d.totalFee) * 1.5);
-            d3.selectAll(`.flow-to-${escapedCountry}`).style("opacity", 0.95).style("stroke-width", d => strokeWidthScale(d.totalFee) * 1.5);
-            
+            d3.selectAll(`.flow-from-${escapedCountry}`).style("opacity", 0.95);
+            d3.selectAll(`.flow-to-${escapedCountry}`).style("opacity", 0.95);
             d3.selectAll(`.flow-anim-from-${escapedCountry}`).style("opacity", 0.85);
             d3.selectAll(`.flow-anim-to-${escapedCountry}`).style("opacity", 0.85);
         })
@@ -320,18 +265,19 @@ Promise.all([
                 .style("top", (event.pageY - 20) + "px");
         })
         .on("mouseout", function() {
-            d3.select(this).style("fill", null); // Reset country fill
+            d3.select(this).style("fill", null);
             hideTooltip();
+
+            d3.selectAll(".countries-layer path").style("opacity", d => {
+                const cname = d.properties.name;
+                if (cname === "England") return 1.0;
+                return countryStats[cname] ? 1.0 : 0.15;
+            });
             
-            // Reset flow line styling
-            d3.selectAll(".flow-line")
-                .style("opacity", 0.3)
-                .style("stroke-width", d => strokeWidthScale(d.totalFee));
-            d3.selectAll(".flow-animation-line")
-                .style("opacity", 0.7);
+            d3.selectAll(".flow-line").style("opacity", 0.3);
+            d3.selectAll(".flow-animation-line").style("opacity", 0.7);
         })
         .on("click", function(event, d) {
-            // Zoom in on clicked country
             event.stopPropagation();
             const bounds = path.bounds(d);
             const dx = bounds[1][0] - bounds[0][0];
@@ -346,80 +292,64 @@ Promise.all([
                 .call(zoom.transform, d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale));
         });
 
-    // Helper to sanitize name strings for CSS class selectors
-    function escapeClass(val) {
-        return val.replace(/[^a-zA-Z0-9]/g, "-");
-    }
-
-    // Reset zoom when clicking on empty map regions
     svg.on("click", () => {
-        svg.transition()
-            .duration(750)
-            .call(zoom.transform, d3.zoomIdentity);
+        svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity);
     });
 
-    // 11. Draw Transfer Flow Curves
+    // 10. Draw transfer flow curves with volume-scaled dynamic particles
     const flowsGroup = mapGroup.append("g").attr("class", "flows-layer");
 
     flows.forEach(flow => {
         const sourceCoord = getCoords(flow.from);
         const targetCoord = getCoords(flow.to);
 
-        if (!sourceCoord || !targetCoord) return; // Skip missing coordinate links
+        if (!sourceCoord || !targetCoord) return;
 
         const source = projection(sourceCoord);
         const target = projection(targetCoord);
 
-        // Calculate a perpendicular curved midpoint to bend the transfer paths beautifully
         const midX = (source[0] + target[0]) / 2;
         const midY = (source[1] + target[1]) / 2;
         const dx = target[0] - source[0];
         const dy = target[1] - source[1];
         
-        // Bend curves offset perpendicular to the direction vector
         const angle = Math.atan2(dy, dx);
-        const bendOffset = 40; // Bend amount in pixels
+        const bendOffset = 40;
         const bendX = midX - bendOffset * Math.sin(angle);
         const bendY = midY + bendOffset * Math.cos(angle);
 
         const pathData = `M ${source[0]},${source[1]} Q ${bendX},${bendY} ${target[0]},${target[1]}`;
 
-        // Direction classification
         const isIncoming = flow.to === "England";
         const flowClass = isIncoming ? "incoming" : "outgoing";
-
-        // Escaped names for class highlights
         const fromEsc = escapeClass(csvToGeoJsonName(flow.from));
         const toEsc = escapeClass(csvToGeoJsonName(flow.to));
 
-        // Draw static background flow line (width scaled by volume)
+        // Background curve line (thickened by volume)
         flowsGroup.append("path")
             .datum(flow)
             .attr("d", pathData)
             .attr("class", `flow-line ${flowClass} flow-from-${fromEsc} flow-to-${toEsc}`)
-            .style("stroke-width", strokeWidthScale(flow.totalFee))
+            .style("stroke-width", strokeWidthScaleBg(flow.totalFee))
             .style("opacity", 0.3)
             .on("mouseover", function(event, d) {
-                d3.select(this).style("opacity", 0.95).style("stroke-width", strokeWidthScale(d.totalFee) * 1.5);
+                d3.select(this).style("opacity", 0.95).style("stroke-width", strokeWidthScaleBg(d.totalFee) * 1.5);
                 
-                // Highlight source and target country elements
                 d3.selectAll(".country").style("opacity", 0.4);
                 d3.selectAll(".country").filter(c => c.properties.name === csvToGeoJsonName(d.from) || c.properties.name === csvToGeoJsonName(d.to))
                     .style("opacity", 1)
                     .style("fill", "#94a3b8");
 
-                // Dim other lines
                 d3.selectAll(".flow-line").filter(l => l !== d).style("opacity", 0.03);
                 d3.selectAll(".flow-animation-line").filter(l => l.datum() !== d).style("opacity", 0);
 
-                // Build detailed HTML tooltip showing players transferred
                 const topPlayers = d.players.slice(0, 4).map(p => `
                     <div style="margin-top:4px; font-size:11px; display:flex; justify-content:space-between; gap:10px;">
                         <span style="color:var(--text-primary);">${p.name} (${p.season})</span>
                         <span style="color:var(--accent-cyan); font-weight:600;">£${formatFee(p.fee)}</span>
                     </div>
                 `).join("");
-
+ 
                 const tooltipHtml = `
                     <div style="font-weight:600; font-size:13px; border-bottom: 1px solid var(--border-glass); padding-bottom:4px; margin-bottom:6px;">
                         ${d.from} ➔ ${d.to}
@@ -438,23 +368,34 @@ Promise.all([
                     .style("top", (event.pageY - 20) + "px");
             })
             .on("mouseout", function(event, d) {
-                d3.select(this).style("stroke-width", strokeWidthScale(d.totalFee)).style("opacity", 0.3);
+                d3.select(this).style("stroke-width", strokeWidthScaleBg(d.totalFee)).style("opacity", 0.3);
                 d3.selectAll(".country").style("opacity", null).style("fill", null);
-                d3.selectAll(".flow-line").style("opacity", 0.3).style("stroke-width", d => strokeWidthScale(d.totalFee));
+                d3.selectAll(".flow-line").style("opacity", 0.3).style("stroke-width", d => strokeWidthScaleBg(d.totalFee));
                 d3.selectAll(".flow-animation-line").style("opacity", 0.7);
                 hideTooltip();
             });
 
-        // Draw animated overlay dashed line for particle movement flow direction
+        // Dynamic scale speed and width of particle flows
+        // Larger volume = faster speed (shorter duration) & thicker stroke
+        const particleDuration = d3.scaleLinear()
+            .domain([0, maxFee])
+            .range([6.0, 0.8])(flow.totalFee);
+        
+        const particleWidth = strokeWidthScaleParticle(flow.totalFee);
+        const particleOpacity = d3.scaleLinear()
+            .domain([0, maxFee])
+            .range([0.4, 0.95])(flow.totalFee);
+
         flowsGroup.append("path")
             .datum(flow)
             .attr("d", pathData)
             .attr("class", `flow-animation-line ${flowClass} flow-anim-from-${fromEsc} flow-anim-to-${toEsc}`)
-            .style("stroke-width", 1.2)
-            .style("opacity", 0.7);
+            .style("stroke-width", particleWidth)
+            .style("animation-duration", `${particleDuration}s`)
+            .style("opacity", particleOpacity);
     });
 
-    // 12. Add HUD zoom control buttons
+    // 11. HUD Zoom Controls
     const controls = container.append("div")
         .attr("class", "zoom-controls");
 

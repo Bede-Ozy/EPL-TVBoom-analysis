@@ -667,7 +667,7 @@
                             <div class="card-text">
                                 To represent the global reach of the Premier League's financial dominance, this visual maps the movement of players across countries. England is highlighted as the center of player movement, with active partner nations shaded in dark blue.
                                 <br><br>
-                                Curved paths flow between countries, with <strong>cyan lines</strong> indicating players bought by English clubs and <strong>gold lines</strong> representing players sold abroad. Animated particle dashes slide continuously along these paths, showing the direction of flow. Hovering over a country highlights its borders and dims unrelated paths, while tooltips list top players traded, transfer counts, and cumulative fees.
+                                Curved paths flow between countries, with <strong>cyan lines</strong> indicating players bought by English clubs and <strong>gold lines</strong> representing players sold abroad. Animated particle beads slide continuously along these paths, showing the direction and speed of movement. Both particle stroke widths and animation speeds scale dynamically relative to transaction fees (higher financial volume = thicker lines, faster particle pulses). Hovering over a country highlights its borders and dims unrelated paths, while tooltips list top players traded, transfer counts, and cumulative fees.
                             </div>
                         </div>
                         
@@ -678,21 +678,22 @@
                             <div class="card-text">
                                 The map loads a custom GeoJSON world dataset and translates geographic coordinates into SVG space using a Mercator projection centered to emphasize Europe and the Americas.
                                 <br><br>
-                                Instead of drawing straight lines, we construct curved quadratic Bezier paths. By calculating the midpoint between England and a partner nation, we apply a perpendicular offset vector to bend the curve. To animate flows, we duplicate the path and apply a moving CSS dash-offset.
+                                Instead of drawing straight lines, we construct curved quadratic Bezier paths. By calculating the midpoint between England and a partner nation, we apply a perpendicular offset vector to bend the curve. To animate flows, we duplicate the path and apply volume-scaled moving SVG dash overlays.
                                 
                                 <div class="tech-spec">
-                                    <div class="tech-spec-label">Bezier Curve and CSS Dash Animation</div>
+                                    <div class="tech-spec-label">Volume-Scaled Dynamic Particle Flow</div>
                                     // Curved path data generator (SVG Quadratic Bezier)
                                     const pathData = `M ${source[0]},${source[1]} Q ${bendX},${bendY} ${target[0]},${target[1]}`;
 
-                                    // CSS animation applied to the dashed flow overlay
+                                    // Dynamic particle speed: larger transfer volume = faster pulse duration
+                                    const particleDuration = d3.scaleLinear().domain([0, maxFee]).range([6.0, 0.8])(flow.totalFee);
+                                    const particleWidth = strokeWidthScaleParticle(flow.totalFee);
+
+                                    // SVG dashed particle overlay
                                     .flow-animation-line {
                                         stroke-linecap: round;
-                                        stroke-dasharray: 6 15;
+                                        stroke-dasharray: 0.1 28; /* Circular bead particles */
                                         animation: flow-dash 1.8s linear infinite;
-                                    }
-                                    @keyframes flow-dash {
-                                        to { stroke-dashoffset: -42; }
                                     }
                                 </div>
                             </div>
@@ -814,7 +815,7 @@
                 <p class="doc-section-desc">Details regarding the data origins, source, and criteria used for the visualizations in this project.</p>
                 
                 <div class="interactive-feature">
-                    <strong>Source Citation:</strong> All transfer market statistics, player values, and volume movements visualized in this project were retrieved from the <strong>Transfermarkt</strong> website.
+                    <strong>Source Citation:</strong> All transfer statistics, player valuations, and volume movements visualized in this project were compiled from publicly available football transfer records and published club financial disclosure reports.
                 </div>
                 
                 <div class="card-text" style="margin-top: 20px;">
